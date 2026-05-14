@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Atkinson+Hyperlegible+Next:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#d9dadb",
+                        "on-primary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#0c5136",
+                        "on-surface-variant": "#414844",
+                        "primary-container": "#1b4332",
+                        "secondary-container": "#fdc39a",
+                        "inverse-on-surface": "#f0f1f2",
+                        "surface-tint": "#3f6653",
+                        "on-background": "#191c1d",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#00452d",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#f8f9fa",
+                        "on-tertiary-fixed": "#002113",
+                        "surface-container-highest": "#e1e3e4",
+                        "surface": "#f8f9fa",
+                        "surface-container-high": "#e7e8e9",
+                        "on-primary-container": "#86af99",
+                        "secondary-fixed-dim": "#f4bb92",
+                        "primary-fixed": "#c1ecd4",
+                        "surface-container": "#edeeef",
+                        "tertiary-fixed-dim": "#94d4b1",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#2e3132",
+                        "background": "#f8f9fa",
+                        "tertiary-fixed": "#b0f1cc",
+                        "outline": "#717973",
+                        "secondary-fixed": "#ffdcc5",
+                        "secondary": "#805533",
+                        "on-secondary-fixed": "#301400",
+                        "surface-variant": "#e1e3e4",
+                        "on-error-container": "#93000a",
+                        "on-secondary-container": "#794e2e",
+                        "on-tertiary-container": "#74b392",
+                        "on-secondary-fixed-variant": "#653d1e",
+                        "primary-fixed-dim": "#a5d0b9",
+                        "on-surface": "#191c1d",
+                        "inverse-primary": "#a5d0b9",
+                        "primary": "#012d1d",
+                        "surface-container-low": "#f3f4f5",
+                        "outline-variant": "#c1c8c2",
+                        "on-primary-fixed": "#002114",
+                        "on-primary-fixed-variant": "#274e3d",
+                        "error": "#ba1a1a",
+                        "tertiary": "#002d1b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "40px",
+                        "margin-mobile": "20px",
+                        "gutter": "16px",
+                        "base": "8px",
+                        "stack-md": "24px",
+                        "stack-lg": "40px",
+                        "stack-sm": "12px"
+                    },
+                    "fontFamily": {
+                        "title-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Atkinson Hyperlegible Next"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "body-lg": ["Atkinson Hyperlegible Next"],
+                        "label-md": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-1px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.5px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Atkinson Hyperlegible Next', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-inverse-surface shadow-sm fixed top-0 w-full z-50 h-16 flex items-center justify-between px-margin-mobile">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed" data-icon="agriculture">agriculture</span>
+<span class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed">Grama-Vaxi</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-label-md font-label-md text-on-surface-variant">EN/KN</span>
+<button class="active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<main class="mt-20 px-margin-mobile space-y-stack-md">
+<!-- Title -->
+<div class="flex items-center justify-between">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Ganga (Cow) - Digital Health Card</h1>
+<span class="material-symbols-outlined text-primary" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<!-- Hero Card: Photo & QR -->
+<div class="relative w-full h-64 rounded-lg overflow-hidden shadow-lg border-2 border-surface-container-high">
+<img alt="Cow profile" class="w-full h-full object-cover" data-alt="A detailed, close-up photograph of a majestic Gir cow with distinctive curved horns and a warm brown coat. The cow is standing in a lush, sun-drenched green pasture under soft morning light. The visual style is crisp and professional, evoking agricultural excellence and high-tech livestock management. A subtle digital overlay feel is present to match a modern corporate farm dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7rmBrvCwBQRGy1S0qW2CcZElSJ5691eyUoJ4lN9FRf-9qN0GIicFLU9i0oPfteoa-bxjpjouto_C_aNmiOfpeUU_BPmDLIiY7_VER8bCw4Xj77KsYb64VHZjvhx1-Ot9nVt3S_FOeXJjNVLByZNGVTF7rG64zDv1FlRB9Qn1cx08jTj00S6kmxLVagXLXV8Nxq9FGlgKLC5wgyfOXSNlTdbn2AVc1EU1zfwubsGmonsqzIWccPX_jXIWL7Ii09l9VWID6EUMwKPM"/>
+<!-- QR Code Overlay -->
+<div class="absolute bottom-4 right-4 bg-white p-2 rounded-lg shadow-xl flex flex-col items-center">
+<img alt="ID QR Code" class="w-16 h-16" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBN4DukE4jKC3TmIxVM5xVIlX3iTjUofULebbJhUbBW0LThef5ZMSeR-X9NSWpLPmqTVdh3kt5yoGAJl6IrS3xljZWuiBCqq61u-w6uX9a3N7YQLS9-gg-cSUQoSnr80jXZqqE1DI-ucV5VpsWvFhPlqkneMZ-zy4LmflfDopDgnJ3M9-We_zS04HwTShgG-XAnqcFsOwClPHElVCDf4_mai1hiZn00YgmGF0rRAKOfBbQpq5N11L4hIlkaMjMxVUDobHB2mW4H6jE"/>
+<span class="text-[10px] font-bold mt-1 text-primary">ID: GRM-9921</span>
+</div>
+<!-- Floating ID Chip -->
+<div class="absolute top-4 left-4 bg-primary-container text-on-primary-container px-3 py-1 rounded-full text-label-md font-label-md shadow-md flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="fingerprint">fingerprint</span>
+<span>Active Tracking</span>
+</div>
+</div>
+<!-- Section 1: Identity & Vitals (Bento Style) -->
+<section>
+<h2 class="font-title-md text-title-md text-on-surface-variant mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span> Identity &amp; Vitals
+            </h2>
+<div class="bento-grid">
+<div class="bg-surface-container-low p-4 rounded-lg border border-outline-variant/30 shadow-sm flex flex-col">
+<span class="text-label-md font-label-md text-on-surface-variant">Breed</span>
+<span class="text-title-md font-title-md text-primary">Gir</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg border border-outline-variant/30 shadow-sm flex flex-col">
+<span class="text-label-md font-label-md text-on-surface-variant">Age</span>
+<span class="text-title-md font-title-md text-primary">4 Years</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg border border-outline-variant/30 shadow-sm flex flex-col">
+<span class="text-label-md font-label-md text-on-surface-variant">Gender</span>
+<span class="text-title-md font-title-md text-primary">Female</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg border border-outline-variant/30 shadow-sm flex flex-col">
+<span class="text-label-md font-label-md text-on-surface-variant">Weight</span>
+<span class="text-title-md font-title-md text-primary">380 kg</span>
+</div>
+</div>
+</section>
+<!-- Section 2: Vaccination Timeline -->
+<section class="bg-primary-container/5 p-5 rounded-lg border-l-4 border-primary">
+<div class="flex justify-between items-center mb-4">
+<h2 class="font-title-md text-title-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="vaccines">vaccines</span> Vaccination Timeline
+                </h2>
+<span class="text-label-md font-bold text-primary">75% Complete</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-3 mb-4">
+<div class="bg-primary h-3 rounded-full" style="width: 75%"></div>
+</div>
+<div class="flex justify-between text-label-md font-label-md text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-primary"></span> FMD Dose 1</span>
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-secondary"></span> Anthrax (Due)</span>
+</div>
+</section>
+<!-- Section 3: Health History -->
+<section>
+<h2 class="font-title-md text-title-md text-on-surface-variant mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="history">history</span> Health History
+            </h2>
+<div class="space-y-3">
+<!-- Record 1 -->
+<div class="flex gap-4 p-4 bg-white rounded-lg border border-outline-variant shadow-sm items-start">
+<div class="bg-tertiary-container/20 p-2 rounded-full">
+<span class="material-symbols-outlined text-on-tertiary-container" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div>
+<p class="font-title-md text-body-md text-on-surface font-bold">Lumpy Skin Vaccination</p>
+<p class="text-label-md text-on-surface-variant">Administered by Dr. Ramesh on Jan 12, 2024</p>
+</div>
+</div>
+<!-- Record 2 -->
+<div class="flex gap-4 p-4 bg-white rounded-lg border border-outline-variant shadow-sm items-start">
+<div class="bg-secondary-container/20 p-2 rounded-full">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="medication">medication</span>
+</div>
+<div>
+<p class="font-title-md text-body-md text-on-surface font-bold">Deworming Treatment</p>
+<p class="text-label-md text-on-surface-variant">Scheduled check-up on Nov 05, 2023</p>
+</div>
+</div>
+<!-- Record 3 -->
+<div class="flex gap-4 p-4 bg-white rounded-lg border border-outline-variant shadow-sm items-start opacity-70">
+<div class="bg-surface-container-highest p-2 rounded-full">
+<span class="material-symbols-outlined text-outline" data-icon="scale">scale</span>
+</div>
+<div>
+<p class="font-title-md text-body-md text-on-surface font-bold">Weight Check</p>
+<p class="text-label-md text-on-surface-variant">375kg recorded on Oct 14, 2023</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Download Action -->
+<button class="w-full bg-primary text-on-primary py-4 rounded-xl flex items-center justify-center gap-2 font-title-md shadow-lg active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+            Download Health Card (PDF)
+        </button>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-2 py-3 bg-surface-container dark:bg-surface-container-highest shadow-[0_-2px_10px_rgba(27,67,50,0.08)] rounded-t-lg">
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="pets" style="font-variation-settings: 'FILL' 1;">pets</span>
+<span class="font-label-md text-label-md">Animals</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-label-md text-label-md">AI Assistant</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-label-md text-label-md">Calendar</span>
+</div>
+</nav>
+</body></html>

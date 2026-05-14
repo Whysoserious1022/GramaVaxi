@@ -1,0 +1,202 @@
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Grama-Mitra AI Assistant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;family=Atkinson+Hyperlegible+Next:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "surface-dim": "#d9dadb",
+                  "on-primary": "#ffffff",
+                  "on-tertiary": "#ffffff",
+                  "error-container": "#ffdad6",
+                  "on-tertiary-fixed-variant": "#0c5136",
+                  "on-surface-variant": "#414844",
+                  "primary-container": "#1b4332",
+                  "secondary-container": "#fdc39a",
+                  "inverse-on-surface": "#f0f1f2",
+                  "surface-tint": "#3f6653",
+                  "on-background": "#191c1d",
+                  "on-error": "#ffffff",
+                  "tertiary-container": "#00452d",
+                  "on-secondary": "#ffffff",
+                  "surface-bright": "#f8f9fa",
+                  "on-tertiary-fixed": "#002113",
+                  "surface-container-highest": "#e1e3e4",
+                  "surface": "#f8f9fa",
+                  "surface-container-high": "#e7e8e9",
+                  "on-primary-container": "#86af99",
+                  "secondary-fixed-dim": "#f4bb92",
+                  "primary-fixed": "#c1ecd4",
+                  "surface-container": "#edeeef",
+                  "tertiary-fixed-dim": "#94d4b1",
+                  "surface-container-lowest": "#ffffff",
+                  "inverse-surface": "#2e3132",
+                  "background": "#f8f9fa",
+                  "tertiary-fixed": "#b0f1cc",
+                  "outline": "#717973",
+                  "secondary-fixed": "#ffdcc5",
+                  "secondary": "#805533",
+                  "on-secondary-fixed": "#301400",
+                  "surface-variant": "#e1e3e4",
+                  "on-error-container": "#93000a",
+                  "on-surface": "#191c1d",
+                  "inverse-primary": "#a5d0b9",
+                  "primary": "#012d1d",
+                  "surface-container-low": "#f3f4f5",
+                  "outline-variant": "#c1c8c2",
+                  "on-primary-fixed": "#002114",
+                  "on-primary-fixed-variant": "#274e3d",
+                  "error": "#ba1a1a",
+                  "tertiary": "#002d1b"
+          },
+          "borderRadius": {
+                  "DEFAULT": "1rem",
+                  "lg": "2rem",
+                  "xl": "3rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "margin-desktop": "40px",
+                  "margin-mobile": "20px",
+                  "gutter": "16px",
+                  "base": "8px",
+                  "stack-md": "24px",
+                  "stack-lg": "40px",
+                  "stack-sm": "12px"
+          },
+          "fontFamily": {
+                  "title-md": ["Plus Jakarta Sans"],
+                  "headline-lg": ["Plus Jakarta Sans"],
+                  "display-lg": ["Plus Jakarta Sans"],
+                  "body-md": ["Atkinson Hyperlegible Next"],
+                  "headline-lg-mobile": ["Plus Jakarta Sans"],
+                  "body-lg": ["Atkinson Hyperlegible Next"],
+                  "label-md": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+                  "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                  "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                  "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-1px", "fontWeight": "700"}],
+                  "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                  "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                  "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                  "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.5px", "fontWeight": "600"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .mic-pulse {
+      box-shadow: 0 0 0 0 rgba(27, 67, 50, 0.4);
+      animation: pulse-ring 2s infinite;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(27, 67, 50, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(27, 67, 50, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(27, 67, 50, 0); }
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col font-body-md text-body-md">
+<!-- TopAppBar -->
+<header class="bg-surface shadow-sm docked full-width top-0 z-40 fixed top-0 w-full h-16 flex items-center justify-between px-margin-mobile">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="agriculture">agriculture</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">Grama-Vaxi</h1>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-label-md text-label-md text-on-surface-variant">EN/KN</span>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 mt-16 mb-24 overflow-y-auto px-margin-mobile pt-stack-md flex flex-col items-center">
+<!-- AI Identity Header -->
+<div class="text-center mb-stack-lg w-full">
+<div class="inline-flex items-center justify-center p-1 bg-primary-container rounded-full mb-base">
+<div class="w-20 h-20 rounded-full overflow-hidden border-2 border-primary-container shadow-md">
+<img alt="AI Assistant" class="w-full h-full object-cover" data-alt="A friendly and professional digital human avatar with warm features and helpful expression, set against a soft bokeh background of a lush green agricultural field during sunset. The image is clean and modern, reflecting an Earthy Professional aesthetic with soft, warm lighting and vibrant natural greens." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAicsGSDI8MJWWpihzyTNEOLsyGt-X9Y08aE7ZjhZvppvLZMNQoJUlSp_JurBL5BB_U1e51C9O8RJryC1GVfCf0l2pwgtdOMXGqrJmRSpaBFqWaD6naIf1xtrCerECGLdNokrG8BgoGRi4J18bqhIY7qmKDv35vZQwdqkSqNRSvY5GTOfT7RcYijLtIzCPjEDF6PdFj_guIvw-vQjtwYQ524Vlr8O2-b3_4c2m_H_W5zgUp0M1qQMzs6eQuJrqdckXs9UyDZICdaA"/>
+</div>
+</div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Grama-Mitra - AI Livestock Expert</h2>
+<p class="font-label-md text-label-md text-on-surface-variant">Powered by Gemini AI</p>
+</div>
+<!-- Chat Interface Bubble -->
+<div class="w-full max-w-md bg-surface-container-low rounded-lg p-stack-md shadow-sm border border-outline-variant relative">
+<div class="flex items-start gap-4">
+<div class="bg-primary-container text-on-primary-container p-2 rounded-full shrink-0">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+</div>
+<div>
+<p class="font-body-lg text-body-lg text-primary mb-base">Namaste! I can help you with livestock health tips.</p>
+<p class="font-body-md text-body-md text-on-surface-variant italic">"For example, ask me 'What to do if my goat has fever?' in Kannada or English."</p>
+</div>
+</div>
+<!-- Decorative element -->
+<div class="absolute -bottom-2 left-8 w-4 h-4 bg-surface-container-low transform rotate-45 border-r border-b border-outline-variant"></div>
+</div>
+<!-- Quick Action Chips -->
+<div class="w-full max-w-md mt-stack-lg space-y-3">
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-center">Suggested Topics</p>
+<div class="flex flex-wrap justify-center gap-base">
+<button class="bg-surface-container-high hover:bg-surface-container-highest active:scale-95 transition-all text-on-surface font-title-md text-title-md px-4 py-3 rounded-full border border-outline-variant flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="coronavirus">coronavirus</span>
+          Common Diseases
+        </button>
+<button class="bg-surface-container-high hover:bg-surface-container-highest active:scale-95 transition-all text-on-surface font-title-md text-title-md px-4 py-3 rounded-full border border-outline-variant flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="nutrition">nutrition</span>
+          Feeding Tips
+        </button>
+<button class="bg-secondary-container text-on-secondary-container hover:opacity-90 active:scale-95 transition-all font-title-md text-title-md px-4 py-3 rounded-full flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="translate">translate</span>
+          Ask in Kannada
+        </button>
+</div>
+</div>
+<!-- Voice Input Section -->
+<div class="mt-auto pt-stack-lg pb-base w-full flex flex-col items-center">
+<div class="relative mb-stack-md">
+<div class="absolute inset-0 bg-primary opacity-10 rounded-full mic-pulse"></div>
+<button class="relative bg-primary-container text-on-primary-container w-24 h-24 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-4xl" data-icon="mic" style="font-variation-settings: 'FILL' 1;">mic</span>
+</button>
+</div>
+<p class="font-title-md text-title-md text-primary animate-pulse">Listening...</p>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-surface-container shadow-lg docked full-width bottom-0 rounded-t-lg fixed bottom-0 w-full z-50 flex justify-around items-center px-2 py-3">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="pets">pets</span>
+<span class="font-label-md text-label-md">Animals</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-label-md text-label-md font-bold">AI Assistant</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-label-md text-label-md">Calendar</span>
+</a>
+</nav>
+</body></html>

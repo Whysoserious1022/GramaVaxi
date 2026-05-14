@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "994276855305",
+    "project_id": "grama-vaxi-ae8cb",
+    "storage_bucket": "grama-vaxi-ae8cb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:994276855305:android:8c9d9dca54dbc9f3c8f2d8",
+        "android_client_info": {
+          "package_name": "com.gramavaxi.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "994276855305-si1k9jabd7b6qfrid80065usv1beqcj0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkiyN4D0uDz0nN9yyvSj0tRZ3jk8Es-Mg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "994276855305-si1k9jabd7b6qfrid80065usv1beqcj0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:994276855305:android:c17a2f42ae5a2030c8f2d8",
+        "android_client_info": {
+          "package_name": "com.mindMatrix.Grama_Vaxi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "994276855305-si1k9jabd7b6qfrid80065usv1beqcj0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkiyN4D0uDz0nN9yyvSj0tRZ3jk8Es-Mg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "994276855305-si1k9jabd7b6qfrid80065usv1beqcj0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

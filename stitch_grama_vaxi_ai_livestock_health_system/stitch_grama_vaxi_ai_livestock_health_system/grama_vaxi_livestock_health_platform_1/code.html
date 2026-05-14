@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;family=Atkinson+Hyperlegible+Next:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#d9dadb",
+                        "on-primary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#0c5136",
+                        "on-surface-variant": "#414844",
+                        "primary-container": "#1b4332",
+                        "secondary-container": "#fdc39a",
+                        "inverse-on-surface": "#f0f1f2",
+                        "surface-tint": "#3f6653",
+                        "on-background": "#191c1d",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#00452d",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#f8f9fa",
+                        "on-tertiary-fixed": "#002113",
+                        "surface-container-highest": "#e1e3e4",
+                        "surface": "#f8f9fa",
+                        "surface-container-high": "#e7e8e9",
+                        "on-primary-container": "#86af99",
+                        "secondary-fixed-dim": "#f4bb92",
+                        "primary-fixed": "#c1ecd4",
+                        "surface-container": "#edeeef",
+                        "tertiary-fixed-dim": "#94d4b1",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#2e3132",
+                        "background": "#f8f9fa",
+                        "tertiary-fixed": "#b0f1cc",
+                        "outline": "#717973",
+                        "secondary-fixed": "#ffdcc5",
+                        "secondary": "#805533",
+                        "on-secondary-fixed": "#301400",
+                        "surface-variant": "#e1e3e4",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "primary": "#012d1d",
+                        "surface-container-low": "#f3f4f5",
+                        "outline-variant": "#c1c8c2",
+                        "on-primary-fixed": "#002114",
+                        "on-primary-fixed-variant": "#274e3d",
+                        "error": "#ba1a1a",
+                        "tertiary": "#002d1b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "40px",
+                        "margin-mobile": "20px",
+                        "gutter": "16px",
+                        "base": "8px",
+                        "stack-md": "24px",
+                        "stack-lg": "40px",
+                        "stack-sm": "12px"
+                    },
+                    "fontFamily": {
+                        "title-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Atkinson Hyperlegible Next"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "body-lg": ["Atkinson Hyperlegible Next"],
+                        "label-md": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-1px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.5px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #f8f9fa;
+            color: #191c1d;
+            font-family: 'Atkinson Hyperlegible Next', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="bg-surface shadow-sm docked full-width top-0 flex items-center justify-between px-margin-mobile w-full h-16 sticky z-40">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="agriculture">agriculture</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">Grama-Vaxi</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="font-label-md text-label-md text-primary bg-primary-fixed px-3 py-1 rounded-full active:scale-95 transition-transform">
+                EN/KN
+            </button>
+<div class="relative active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-on-surface-variant text-2xl" data-icon="notifications">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
+</div>
+</div>
+</header>
+<main class="px-margin-mobile pt-stack-md space-y-stack-lg max-w-2xl mx-auto">
+<!-- Greeting -->
+<section class="space-y-1">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold">Namaste, Suresh!</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Your livestock health status is updated.</p>
+</section>
+<!-- Health Snapshot Card (Bento Pattern) -->
+<section class="grid grid-cols-2 gap-3">
+<div class="col-span-2 bg-primary-container p-stack-md rounded-lg text-on-primary-container shadow-lg flex items-center justify-between overflow-hidden relative">
+<div class="relative z-10">
+<p class="font-label-md text-label-md text-on-primary-container/80 mb-1">Total Animals</p>
+<p class="font-display-lg text-display-lg text-white">12</p>
+</div>
+<div class="absolute right-[-20px] top-[-20px] opacity-10">
+<span class="material-symbols-outlined text-[120px]" data-icon="pets">pets</span>
+</div>
+<div class="relative z-10 flex flex-col items-end">
+<span class="material-symbols-outlined text-4xl text-on-primary-container" data-icon="health_and_safety">health_and_safety</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg border-l-4 border-[#1B4332] shadow-sm">
+<p class="font-label-md text-label-md text-on-surface-variant">Fully Vaccinated</p>
+<p class="font-headline-lg-mobile text-headline-lg-mobile text-primary">08</p>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg border-l-4 border-secondary shadow-sm">
+<p class="font-label-md text-label-md text-on-surface-variant">Upcoming</p>
+<p class="font-headline-lg-mobile text-headline-lg-mobile text-secondary">03</p>
+</div>
+<div class="col-span-2 bg-error-container p-4 rounded-lg flex items-center gap-4 shadow-sm">
+<div class="w-12 h-12 bg-white/50 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-error" data-icon="emergency_home" data-weight="fill" style="font-variation-settings: 'FILL' 1;">emergency_home</span>
+</div>
+<div>
+<p class="font-title-md text-title-md text-on-error-container">Urgent Action Required</p>
+<p class="font-body-md text-body-md text-on-error-container/80">1 animal needs immediate attention</p>
+</div>
+</div>
+</section>
+<!-- Quick Actions Grid -->
+<section class="space-y-stack-sm">
+<h3 class="font-title-md text-title-md text-primary">Quick Actions</h3>
+<div class="grid grid-cols-3 gap-3">
+<button class="bg-white p-4 rounded-lg flex flex-col items-center justify-center gap-2 shadow-sm border border-outline-variant active:scale-95 transition-all">
+<span class="material-symbols-outlined text-primary" data-icon="add_box">add_box</span>
+<span class="font-label-md text-[12px] text-center text-on-surface-variant">Register Animal</span>
+</button>
+<button class="bg-white p-4 rounded-lg flex flex-col items-center justify-center gap-2 shadow-sm border border-outline-variant active:scale-95 transition-all">
+<span class="material-symbols-outlined text-error" data-icon="report_problem">report_problem</span>
+<span class="font-label-md text-[12px] text-center text-on-surface-variant">Report Sickness</span>
+</button>
+<button class="bg-white p-4 rounded-lg flex flex-col items-center justify-center gap-2 shadow-sm border border-outline-variant active:scale-95 transition-all">
+<span class="material-symbols-outlined text-secondary" data-icon="local_hospital">local_hospital</span>
+<span class="font-label-md text-[12px] text-center text-on-surface-variant">Find Vet Camp</span>
+</button>
+</div>
+</section>
+<!-- Recent Activity -->
+<section class="space-y-stack-sm">
+<div class="flex items-center justify-between">
+<h3 class="font-title-md text-title-md text-primary">Recent Activity</h3>
+<button class="text-primary font-label-md text-label-md">View All</button>
+</div>
+<div class="space-y-3">
+<!-- Activity Item 1 -->
+<div class="bg-white p-4 rounded-lg flex gap-4 shadow-sm border border-outline-variant items-center">
+<div class="w-12 h-12 bg-surface-container rounded-full overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A close-up photographic portrait of a healthy Indian Sahiwal cow in a sun-drenched rural pasture. The lighting is golden hour warm, highlighting the rich textures of the cow's hide and the earthy professional tone of the agricultural setting. The overall mood is serene and reliable, emphasizing high-quality livestock care in a modern farm environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7eP6J7ZprevV8gohqkm4wqinJf1cJrWZLB9kUPOcsr1y-it-h-pn1Oj6KwkQmxGoPTGfc3WsEnLzhLrvdIeQgtE75oRfQASJlev829q8oIA9Tp9JTrZLesb4D3AZS41rML99ERR7Xv22E7VVq4-nAHjA4So4HNGgiJ8y_hF-z0P3EGYuP47c1f6WgkJ-HANd0fdAvat1_0mh4YDlQPaXwIHIWvrt-RVvj772KiQLzn5w3btDsHo-4AJz3YmdWofnBXhzKQ4BiKUM"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start">
+<p class="font-title-md text-title-md text-primary">Ganga (Cow)</p>
+<span class="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full text-[10px] font-bold">DUE SOON</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">FMD Vaccine Due in 3 days</p>
+</div>
+</div>
+<!-- Activity Item 2 -->
+<div class="bg-white p-4 rounded-lg flex gap-4 shadow-sm border border-outline-variant items-center">
+<div class="w-12 h-12 bg-tertiary-container rounded-full flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-tertiary-fixed" data-icon="smart_toy">smart_toy</span>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start">
+<p class="font-title-md text-title-md text-primary">Disease Report</p>
+<span class="text-on-surface-variant font-label-md text-[10px]">2h ago</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Symptoms reviewed by AI Assistant</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Educational Section (Card) -->
+<section class="bg-surface-container-high rounded-lg p-stack-md flex gap-4 items-center">
+<div class="flex-grow">
+<h4 class="font-title-md text-title-md text-primary">Monsoon Care Tips</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Protect your cattle from foot rot during rains.</p>
+</div>
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="umbrella">umbrella</span>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-2 py-3 bg-surface-container shadow-[0_-2px_10px_rgba(27,67,50,0.08)] rounded-t-lg">
+<!-- Dashboard (Active) -->
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard" data-weight="fill" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<!-- Animals -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="pets">pets</span>
+<span class="font-label-md text-label-md">Animals</span>
+</a>
+<!-- AI Assistant (FAB Style Center) -->
+<div class="relative -top-6">
+<button class="w-16 h-16 bg-primary rounded-full shadow-lg flex items-center justify-center text-white active:scale-95 transition-transform border-4 border-background">
+<span class="material-symbols-outlined text-3xl" data-icon="smart_toy">smart_toy</span>
+</button>
+</div>
+<!-- Calendar -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-label-md text-label-md">Calendar</span>
+</a>
+<!-- Profile (Extra for balance) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+</nav>
+</body></html>

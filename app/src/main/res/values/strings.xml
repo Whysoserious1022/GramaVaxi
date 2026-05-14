@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">Grama-Vaxi</string>
+
+    <!-- Onboarding -->
+    <string name="select_language">Select Language</string>
+    <string name="login_title">Login with Mobile</string>
+    <string name="enter_otp">Enter OTP</string>
+    <string name="send_otp">Send OTP</string>
+    <string name="verify_otp">Verify OTP</string>
+    <string name="mobile_number">Mobile Number</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Grama-Vaxi</string>
+    <string name="total_animals">Total Animals</string>
+    <string name="healthy">Healthy</string>
+    <string name="need_care">Need Care</string>
+    <string name="upcoming_this_week">Upcoming This Week</string>
+    <string name="overdue_vaccinations">Overdue Vaccinations</string>
+    <string name="quick_actions">Quick Actions</string>
+    <string name="my_animals">My Animals</string>
+    <string name="ai_doctor">AI Doctor</string>
+    <string name="find_vet">Find Vet</string>
+    <string name="analytics">Analytics</string>
+
+    <!-- Animal -->
+    <string name="register_animal">Register Animal</string>
+    <string name="animal_name">Animal Name</string>
+    <string name="species">Species</string>
+    <string name="breed">Breed</string>
+    <string name="age_months">Age (months)</string>
+    <string name="sex">Sex</string>
+    <string name="owner_name">Owner Name</string>
+    <string name="owner_phone">Mobile Number</string>
+    <string name="village_name">Village Name</string>
+    <string name="district">District</string>
+    <string name="notes_optional">Notes (optional)</string>
+    <string name="register_and_generate">Register &amp; Generate Schedule</string>
+
+    <!-- AI Chat -->
+    <string name="ai_chat_title">Grama-Vaxi AI</string>
+    <string name="type_or_speak">Type or speak your question…</string>
+    <string name="thinking">Thinking…</string>
+
+    <!-- Alerts -->
+    <string name="alerts_title">Disease Alerts</string>
+    <string name="report_outbreak">Report Outbreak</string>
+
+    <!-- Common -->
+    <string name="back">Back</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="loading">Loading…</string>
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="no_internet">No internet connection</string>
+    <string name="offline_mode">Offline Mode – Changes will sync when online</string>
+
+    <!-- Vaccine Status -->
+    <string name="status_pending">Pending</string>
+    <string name="status_completed">Completed</string>
+    <string name="status_overdue">Overdue</string>
+    <string name="status_skipped">Skipped</string>
+</resources>
