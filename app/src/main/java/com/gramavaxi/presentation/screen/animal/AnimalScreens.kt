@@ -1,74 +1,49 @@
 package com.gramavaxi.presentation.screen.animal
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.HealthAndSafety
-import androidx.compose.material.icons.filled.Pets
-import androidx.compose.material.icons.filled.Psychology
-import androidx.compose.material.icons.filled.Save
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gramavaxi.domain.model.Animal
-import com.gramavaxi.presentation.theme.GreenMedium
+import com.gramavaxi.presentation.theme.*
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+import com.gramavaxi.presentation.util.ImageHelper
+
+// ─────────────────────────────────────────────────────────────────────────────
+// REGISTER ANIMAL SCREEN
+// ─────────────────────────────────────────────────────────────────────────────
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterAnimalScreen(
@@ -88,6 +63,20 @@ fun RegisterAnimalScreen(
     var village by remember { mutableStateOf("") }
     var district by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
+    var photoUri by remember { mutableStateOf<String?>(null) }
+    
+    val context = LocalContext.current
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            uri?.let {
+                val savedPath = ImageHelper.saveImageLocally(context, it)
+                if (savedPath != null) {
+                    photoUri = savedPath
+                }
+            }
+        }
+    )
 
     val speciesOptions = listOf("Cow", "Buffalo", "Goat", "Sheep", "Pig")
     val sexOptions = listOf("Female", "Male")
@@ -104,91 +93,174 @@ fun RegisterAnimalScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Register Animal", color = Color.White, fontWeight = FontWeight.Bold) },
+                title = { Text("Register Animal", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Back", tint = Color.White)
+                        Icon(Icons.Default.ArrowBack, "Back")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = GreenMedium)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = SurfaceContainerLowest,
+                    titleContentColor = Primary,
+                    navigationIconContentColor = Primary
+                ),
+                modifier = Modifier.shadow(2.dp)
             )
-        }
+        },
+        containerColor = Background
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            SectionHeader("Animal details")
-
-            GramaTextField(value = name, onValueChange = { name = it }, label = "Animal name *")
-
-            ExposedDropdownMenuBox(expanded = expandedSpecies, onExpandedChange = { expandedSpecies = it }) {
-                OutlinedTextField(
-                    value = species,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Species *") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedSpecies) },
-                    modifier = Modifier.fillMaxWidth().menuAnchor()
-                )
-                ExposedDropdownMenu(expanded = expandedSpecies, onDismissRequest = { expandedSpecies = false }) {
-                    speciesOptions.forEach { option ->
-                        DropdownMenuItem(text = { Text(option) }, onClick = {
-                            species = option
-                            expandedSpecies = false
-                        })
-                    }
-                }
-            }
-
-            GramaTextField(value = breed, onValueChange = { breed = it }, label = "Breed")
-            GramaTextField(
-                value = ageMonths,
-                onValueChange = { ageMonths = it },
-                label = "Age in months *",
-                keyboardType = KeyboardType.Number
+            Text(
+                "Add a new animal to your registry to start tracking health and vaccinations.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = OnSurfaceVariant
             )
 
-            ExposedDropdownMenuBox(expanded = expandedSex, onExpandedChange = { expandedSex = it }) {
-                OutlinedTextField(
-                    value = sex,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Sex *") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedSex) },
-                    modifier = Modifier.fillMaxWidth().menuAnchor()
-                )
-                ExposedDropdownMenu(expanded = expandedSex, onDismissRequest = { expandedSex = false }) {
-                    sexOptions.forEach { option ->
-                        DropdownMenuItem(text = { Text(option) }, onClick = {
-                            sex = option
-                            expandedSex = false
-                        })
+            SectionHeader("🐄 Animal Details")
+            
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .background(SurfaceContainerHigh)
+                        .clickable {
+                            photoPickerLauncher.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (photoUri != null) {
+                        AsyncImage(
+                            model = photoUri,
+                            contentDescription = "Animal Photo",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.AddAPhoto,
+                            contentDescription = "Add Photo",
+                            tint = OnSurfaceVariant,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                }
+            }
+            
+            GramaTextField(value = name, onValueChange = { name = it }, label = "Animal Name *", placeholder = "e.g. Lakshmi")
+
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                ExposedDropdownMenuBox(
+                    expanded = expandedSpecies, 
+                    onExpandedChange = { expandedSpecies = it },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    OutlinedTextField(
+                        value = species,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Species *") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedSpecies) },
+                        modifier = Modifier.fillMaxWidth().menuAnchor(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Primary,
+                            focusedLabelColor = Primary
+                        )
+                    )
+                    ExposedDropdownMenu(expanded = expandedSpecies, onDismissRequest = { expandedSpecies = false }) {
+                        speciesOptions.forEach { option ->
+                            DropdownMenuItem(text = { Text(option) }, onClick = {
+                                species = option
+                                expandedSpecies = false
+                            })
+                        }
+                    }
+                }
+
+                ExposedDropdownMenuBox(
+                    expanded = expandedSex, 
+                    onExpandedChange = { expandedSex = it },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    OutlinedTextField(
+                        value = sex,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Sex *") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedSex) },
+                        modifier = Modifier.fillMaxWidth().menuAnchor(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Primary,
+                            focusedLabelColor = Primary
+                        )
+                    )
+                    ExposedDropdownMenu(expanded = expandedSex, onDismissRequest = { expandedSex = false }) {
+                        sexOptions.forEach { option ->
+                            DropdownMenuItem(text = { Text(option) }, onClick = {
+                                sex = option
+                                expandedSex = false
+                            })
+                        }
                     }
                 }
             }
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                GramaTextField(
+                    modifier = Modifier.weight(1.2f),
+                    value = breed, 
+                    onValueChange = { breed = it }, 
+                    label = "Breed", 
+                    placeholder = "e.g. Gir"
+                )
+                GramaTextField(
+                    modifier = Modifier.weight(0.8f),
+                    value = ageMonths,
+                    onValueChange = { ageMonths = it },
+                    label = "Age (Months) *",
+                    keyboardType = KeyboardType.Number,
+                    placeholder = "24"
+                )
+            }
 
-            SectionHeader("Owner details")
-            GramaTextField(value = ownerName, onValueChange = { ownerName = it }, label = "Owner name *")
+            Spacer(Modifier.height(8.dp))
+            SectionHeader("👤 Owner Details")
+            
+            GramaTextField(value = ownerName, onValueChange = { ownerName = it }, label = "Owner Name *")
             GramaTextField(
                 value = ownerPhone,
                 onValueChange = { ownerPhone = it },
-                label = "Mobile number *",
-                keyboardType = KeyboardType.Phone
+                label = "Mobile Number *",
+                keyboardType = KeyboardType.Phone,
+                placeholder = "9876543210"
             )
-            GramaTextField(value = village, onValueChange = { village = it }, label = "Village name *")
-            GramaTextField(value = district, onValueChange = { district = it }, label = "District *")
+            
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                GramaTextField(modifier = Modifier.weight(1f), value = village, onValueChange = { village = it }, label = "Village *")
+                GramaTextField(modifier = Modifier.weight(1f), value = district, onValueChange = { district = it }, label = "District *")
+            }
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+            Spacer(Modifier.height(8.dp))
+            SectionHeader("📝 Additional Notes")
+            GramaTextField(value = notes, onValueChange = { notes = it }, label = "Notes", minLines = 3, placeholder = "Add any health history...")
 
-            SectionHeader("Additional notes")
-            GramaTextField(value = notes, onValueChange = { notes = it }, label = "Notes", minLines = 2)
+            Spacer(Modifier.height(12.dp))
 
             Button(
                 onClick = {
@@ -202,10 +274,14 @@ fun RegisterAnimalScreen(
                         ownerPhone = ownerPhone,
                         village = village,
                         district = district,
-                        notes = notes
+                        notes = notes,
+                        photoUri = photoUri
                     )
                 },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(58.dp)
+                    .shadow(8.dp, RoundedCornerShape(18.dp)),
                 enabled = name.isNotBlank() &&
                     ownerName.isNotBlank() &&
                     ownerPhone.isNotBlank() &&
@@ -213,66 +289,40 @@ fun RegisterAnimalScreen(
                     district.isNotBlank() &&
                     ageMonths.toIntOrNull() != null &&
                     uiState !is AnimalUiState.Loading,
-                colors = ButtonDefaults.buttonColors(containerColor = GreenMedium),
-                shape = RoundedCornerShape(12.dp)
+                colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                shape = RoundedCornerShape(18.dp)
             ) {
                 if (uiState is AnimalUiState.Loading) {
                     CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
                 } else {
-                    Icon(Icons.Default.Save, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Register and create schedule", fontWeight = FontWeight.Bold)
+                    Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.width(10.dp))
+                    Text("Register Animal", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
             }
 
             if (uiState is AnimalUiState.Error) {
-                Card(colors = CardDefaults.cardColors(containerColor = Color(0xFFFFEBEE))) {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = ErrorContainer),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
                     Text(
                         text = (uiState as AnimalUiState.Error).message,
-                        modifier = Modifier.padding(12.dp),
-                        color = Color(0xFFB71C1C)
+                        modifier = Modifier.padding(16.dp),
+                        color = OnErrorContainer,
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(32.dp))
         }
     }
 }
 
-@Composable
-private fun SectionHeader(title: String) {
-    Text(
-        title,
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.SemiBold,
-        color = GreenMedium
-    )
-}
-
-@Composable
-private fun GramaTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    minLines: Int = 1
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        modifier = Modifier.fillMaxWidth(),
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        minLines = minLines,
-        shape = RoundedCornerShape(10.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = GreenMedium,
-            focusedLabelColor = GreenMedium
-        )
-    )
-}
-
+// ─────────────────────────────────────────────────────────────────────────────
+// ANIMAL LIST SCREEN
+// ─────────────────────────────────────────────────────────────────────────────
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimalListScreen(
@@ -286,39 +336,47 @@ fun AnimalListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("My Animals", color = Color.White, fontWeight = FontWeight.Bold) },
+                title = { Text("My Animals", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Back", tint = Color.White)
+                        Icon(Icons.Default.ArrowBack, "Back")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = GreenMedium)
+                actions = {
+                    IconButton(onClick = onAddAnimal) {
+                        Icon(Icons.Default.Add, "Add", tint = Primary)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = SurfaceContainerLowest,
+                    titleContentColor = Primary,
+                    navigationIconContentColor = Primary
+                ),
+                modifier = Modifier.shadow(2.dp)
             )
         },
-        floatingActionButton = {
-            FloatingActionButton(onClick = onAddAnimal, containerColor = GreenMedium) {
-                Icon(Icons.Default.Add, contentDescription = "Add animal", tint = Color.White)
-            }
-        }
+        containerColor = Background
     ) { padding ->
         if (animals.isEmpty()) {
             EmptyAnimalList(onAddAnimal = onAddAnimal, modifier = Modifier.padding(padding))
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(padding),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                contentPadding = PaddingValues(20.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 item {
                     Text(
                         "${animals.size} registered animal${if (animals.size == 1) "" else "s"}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
+                        style = MaterialTheme.typography.labelLarge,
+                        color = OnSurfaceVariant,
+                        modifier = Modifier.padding(bottom = 4.dp)
                     )
                 }
                 items(animals, key = { it.animalId }) { animal ->
                     AnimalListCard(animal = animal, onClick = { onAnimalClick(animal.animalId) })
                 }
+                item { Spacer(Modifier.height(80.dp)) }
             }
         }
     }
@@ -327,17 +385,31 @@ fun AnimalListScreen(
 @Composable
 private fun EmptyAnimalList(onAddAnimal: () -> Unit, modifier: Modifier = Modifier) {
     Box(
-        modifier = modifier.fillMaxSize().padding(24.dp),
+        modifier = modifier.fillMaxSize().padding(32.dp),
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Icon(Icons.Default.Pets, contentDescription = null, tint = GreenMedium, modifier = Modifier.size(48.dp))
-            Text("No animals registered yet", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            Text("Add an animal to create vaccination dates, reminders, and a health record.")
-            Button(onClick = onAddAnimal, colors = ButtonDefaults.buttonColors(containerColor = GreenMedium)) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Box(
+                modifier = Modifier.size(100.dp).clip(CircleShape).background(PrimaryContainer.copy(0.2f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Default.Pets, contentDescription = null, tint = Primary, modifier = Modifier.size(48.dp))
+            }
+            Text("No animals found", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Primary)
+            Text(
+                "Register your livestock to manage their health records and vaccination schedules.",
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                color = OnSurfaceVariant
+            )
+            Button(
+                onClick = onAddAnimal, 
+                colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                shape = RoundedCornerShape(50.dp),
+                modifier = Modifier.height(52.dp).padding(horizontal = 24.dp)
+            ) {
                 Icon(Icons.Default.Add, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("Add animal")
+                Text("Register Animal", fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -347,26 +419,49 @@ private fun EmptyAnimalList(onAddAnimal: () -> Unit, modifier: Modifier = Modifi
 private fun AnimalListCard(animal: Animal, onClick: () -> Unit) {
     val dateFormat = remember { SimpleDateFormat("dd MMM yyyy", Locale.getDefault()) }
     Card(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(2.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .shadow(4.dp, RoundedCornerShape(20.dp)),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = SurfaceContainerLowest),
+        border = BorderStroke(1.dp, OutlineVariant.copy(0.5f))
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(14.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(Icons.Default.Pets, contentDescription = null, tint = GreenMedium, modifier = Modifier.size(36.dp))
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(animal.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Text("${animal.species} - ${animal.breed} - ${animal.ageMonths} months")
-                Text("Health ID: ${animal.healthId}", style = MaterialTheme.typography.bodySmall)
-                Text("Registered: ${dateFormat.format(Date(animal.createdAt))}", style = MaterialTheme.typography.bodySmall)
+            Box(
+                modifier = Modifier
+                    .size(54.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(PrimaryContainer.copy(0.15f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(if (animal.species == "Cow") "🐄" else if (animal.species == "Goat") "🐐" else "🐾", fontSize = 28.sp)
             }
-            Icon(Icons.Default.ChevronRight, contentDescription = null)
+            Spacer(Modifier.width(16.dp))
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(animal.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Primary)
+                Text(
+                    "${animal.species} · ${animal.breed} · ${animal.ageMonths}m",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = OnSurfaceVariant
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.QrCode, null, modifier = Modifier.size(12.dp), tint = OnSurfaceVariant)
+                    Spacer(Modifier.width(4.dp))
+                    Text(animal.healthId, style = MaterialTheme.typography.labelSmall, color = OnSurfaceVariant)
+                }
+            }
+            Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Outline)
         }
     }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// ANIMAL PROFILE SCREEN
+// ─────────────────────────────────────────────────────────────────────────────
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimalProfileScreen(
@@ -384,54 +479,169 @@ fun AnimalProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(animal?.name ?: "Animal Profile", color = Color.White, fontWeight = FontWeight.Bold) },
+                title = { Text(animal?.name ?: "Profile", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Back", tint = Color.White)
+                        Icon(Icons.Default.ArrowBack, "Back")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = GreenMedium)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = SurfaceContainerLowest,
+                    titleContentColor = Primary,
+                    navigationIconContentColor = Primary
+                ),
+                modifier = Modifier.shadow(2.dp)
             )
-        }
+        },
+        containerColor = Background
     ) { padding ->
         if (animal == null) {
             Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text("Animal not found")
+                CircularProgressIndicator(color = Primary)
             }
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(padding),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                contentPadding = PaddingValues(20.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                item { AnimalProfileSummary(animal) }
+                item { AnimalProfileHero(animal, viewModel) }
+                
+                item { SectionTitle("Health Services") }
+                
                 item {
-                    ActionCard(
+                    ProfileServiceCard(
                         icon = Icons.Default.CalendarMonth,
-                        title = "Vaccination calendar",
-                        subtitle = "View due dates, overdue vaccines, and log completed doses.",
+                        title = "Vaccination Calendar",
+                        subtitle = "Track due dates and log doses",
+                        accentColor = Primary,
                         onClick = onNavigateToCalendar
                     )
                 }
                 item {
-                    ActionCard(
+                    ProfileServiceCard(
                         icon = Icons.Default.HealthAndSafety,
-                        title = "Health card",
-                        subtitle = "Open this animal's health record.",
+                        title = "Digital Health Card",
+                        subtitle = "Full medical history & QR ID",
+                        accentColor = Secondary,
                         onClick = onNavigateToHealthCard
                     )
                 }
+                
+                item { SectionTitle("AI Support") }
+                
                 item {
-                    ActionCard(
-                        icon = Icons.Default.Psychology,
-                        title = "Ask Grama-Vaxi AI",
-                        subtitle = "Get help for symptoms, nutrition, and care questions.",
+                    ProfileServiceCard(
+                        icon = Icons.Default.SmartToy,
+                        title = "Consult Grama AI",
+                        subtitle = "AI diagnosis & care advice",
+                        accentColor = Tertiary,
                         onClick = onNavigateToAIChat
                     )
                 }
                 item {
-                    OutlinedButton(onClick = onNavigateToDiseaseDetection, modifier = Modifier.fillMaxWidth()) {
-                        Text("Open disease detection")
+                    ProfileServiceCard(
+                        icon = Icons.Default.CameraAlt,
+                        title = "Disease Detection",
+                        subtitle = "Scan for visible symptoms",
+                        accentColor = Color(0xFFE91E63),
+                        onClick = onNavigateToDiseaseDetection
+                    )
+                }
+                
+                item { Spacer(Modifier.height(80.dp)) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AnimalProfileHero(
+    animal: Animal,
+    viewModel: AnimalViewModel = hiltViewModel()
+) {
+    val context = LocalContext.current
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            uri?.let {
+                val savedPath = ImageHelper.saveImageLocally(context, it)
+                if (savedPath != null) {
+                    viewModel.updateAnimalPhoto(animal.animalId, savedPath)
+                }
+            }
+        }
+    )
+
+    Card(
+        modifier = Modifier.fillMaxWidth().shadow(6.dp, RoundedCornerShape(24.dp)),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = SurfaceContainerLowest),
+        border = BorderStroke(1.dp, Primary.copy(0.1f))
+    ) {
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp)
+                    .background(Brush.verticalGradient(listOf(Primary, PrimaryContainer)))
+                    .clickable {
+                        photoPickerLauncher.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                if (animal.photoUri != null) {
+                    AsyncImage(
+                        model = animal.photoUri,
+                        contentDescription = "Animal Photo",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Text(if (animal.species == "Cow") "🐄" else if (animal.species == "Goat") "🐐" else "🐾", fontSize = 64.sp)
+                }
+            }
+            Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                    Column {
+                        Text(animal.name, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, color = Primary)
+                        Text("${animal.species} · ${animal.breed}", style = MaterialTheme.typography.titleSmall, color = OnSurfaceVariant)
+                    }
+                    Surface(
+                        color = PrimaryContainer.copy(0.2f),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            animal.healthId,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+                
+                HorizontalDivider(color = OutlineVariant.copy(0.5f))
+                
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    InfoItem(Modifier.weight(1f), "Age", "${animal.ageMonths}m")
+                    InfoItem(Modifier.weight(1f), "Sex", animal.sex)
+                    InfoItem(Modifier.weight(1f), "Village", animal.villageName)
+                }
+                
+                if (!animal.notes.isNullOrBlank()) {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Background),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.Top) {
+                            Icon(Icons.Default.Note, null, modifier = Modifier.size(16.dp), tint = OnSurfaceVariant)
+                            Spacer(Modifier.width(8.dp))
+                            Text(animal.notes ?: "", style = MaterialTheme.typography.bodySmall, color = OnSurfaceVariant)
+                        }
                     }
                 }
             }
@@ -440,36 +650,98 @@ fun AnimalProfileScreen(
 }
 
 @Composable
-private fun AnimalProfileSummary(animal: Animal) {
-    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9))) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(animal.name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-            Text("${animal.species} - ${animal.breed}")
-            Text("Age: ${animal.ageMonths} months | Sex: ${animal.sex}")
-            Text("Health ID: ${animal.healthId}")
-            Text("Owner: ${animal.ownerName} (${animal.ownerPhone})")
-            Text("Village: ${animal.villageName}, ${animal.district}")
-            animal.notes?.let { Text("Notes: $it") }
-        }
+private fun InfoItem(modifier: Modifier, label: String, value: String) {
+    Column(modifier = modifier) {
+        Text(label, style = MaterialTheme.typography.labelSmall, color = OnSurfaceVariant)
+        Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = OnSurface)
     }
 }
 
 @Composable
-private fun ActionCard(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+private fun ProfileServiceCard(
+    icon: ImageVector,
     title: String,
     subtitle: String,
+    accentColor: Color,
     onClick: () -> Unit
 ) {
-    Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick), elevation = CardDefaults.cardElevation(2.dp)) {
-        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, contentDescription = null, tint = GreenMedium, modifier = Modifier.size(32.dp))
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) {
-                Text(title, fontWeight = FontWeight.Bold)
-                Text(subtitle, style = MaterialTheme.typography.bodySmall)
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .shadow(2.dp, RoundedCornerShape(20.dp)),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = SurfaceContainerLowest),
+        border = BorderStroke(1.dp, OutlineVariant.copy(0.5f))
+    ) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(accentColor.copy(0.12f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(icon, contentDescription = null, tint = accentColor, modifier = Modifier.size(24.dp))
             }
-            Icon(Icons.Default.ChevronRight, contentDescription = null)
+            Spacer(Modifier.width(16.dp))
+            Column(Modifier.weight(1f)) {
+                Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = OnSurface)
+                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = OnSurfaceVariant)
+            }
+            Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Outline)
         }
     }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SHARED COMPONENTS
+// ─────────────────────────────────────────────────────────────────────────────
+@Composable
+private fun SectionHeader(title: String) {
+    Text(
+        title,
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.Bold,
+        color = Primary,
+        modifier = Modifier.padding(top = 4.dp)
+    )
+}
+
+@Composable
+private fun SectionTitle(title: String) {
+    Text(
+        title,
+        style = MaterialTheme.typography.labelLarge,
+        fontWeight = FontWeight.Bold,
+        color = OnSurfaceVariant,
+        letterSpacing = 1.sp
+    )
+}
+
+@Composable
+private fun GramaTextField(
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    placeholder: String = "",
+    keyboardType: KeyboardType = KeyboardType.Text,
+    minLines: Int = 1
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        placeholder = { Text(placeholder) },
+        modifier = modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        minLines = minLines,
+        shape = RoundedCornerShape(16.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Primary,
+            focusedLabelColor = Primary,
+            cursorColor = Primary
+        )
+    )
 }

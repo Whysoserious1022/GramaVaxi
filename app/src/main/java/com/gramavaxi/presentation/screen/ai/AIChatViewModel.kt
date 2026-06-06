@@ -90,7 +90,7 @@ class AIChatViewModel @Inject constructor(
             "API key" in message || "403" in message || "401" in message ->
                 "The AI service is not configured correctly. Please check the Gemini API key."
             else ->
-                "Sorry, I am having trouble connecting. Please check your internet connection and try again."
+                "Sorry, I am having trouble connecting.\nError Details: $message"
         }
     }
 }

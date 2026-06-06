@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.gramavaxi.domain.model.Animal
 import com.gramavaxi.domain.usecase.animal.GetAllAnimalsUseCase
 import com.gramavaxi.domain.usecase.animal.RegisterAnimalUseCase
+import com.gramavaxi.domain.usecase.animal.UpdateAnimalPhotoUseCase
 import com.gramavaxi.worker.WorkerScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -22,6 +23,7 @@ sealed class AnimalUiState {
 @HiltViewModel
 class AnimalViewModel @Inject constructor(
     private val registerAnimalUseCase: RegisterAnimalUseCase,
+    private val updateAnimalPhotoUseCase: UpdateAnimalPhotoUseCase,
     getAllAnimalsUseCase: GetAllAnimalsUseCase,
     private val workerScheduler: WorkerScheduler
 ) : ViewModel() {
@@ -42,7 +44,8 @@ class AnimalViewModel @Inject constructor(
         ownerPhone: String,
         village: String,
         district: String,
-        notes: String
+        notes: String,
+        photoUri: String? = null
     ) {
         viewModelScope.launch {
             _uiState.value = AnimalUiState.Loading
@@ -57,7 +60,7 @@ class AnimalViewModel @Inject constructor(
                     sex = sex,
                     color = "",
                     weight = null,
-                    photoUri = null,
+                    photoUri = photoUri,
                     ownerId = "current_user_id", // TODO: get from session
                     ownerName = ownerName.trim(),
                     ownerPhone = ownerPhone.trim(),
@@ -84,6 +87,12 @@ class AnimalViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = AnimalUiState.Error(e.message ?: "Unexpected error")
             }
+        }
+    }
+
+    fun updateAnimalPhoto(animalId: String, photoUri: String) {
+        viewModelScope.launch {
+            updateAnimalPhotoUseCase(animalId, photoUri)
         }
     }
 

@@ -19,6 +19,9 @@ interface AuthRepository {
      * Returns [Result.success] with the FirebaseUser on success, or [Result.failure] on error.
      */
     suspend fun signInWithGoogle(idToken: String): Result<FirebaseUser>
+    
+    suspend fun signInWithEmail(email: String, password: String): Result<FirebaseUser>
+    suspend fun signUpWithEmail(email: String, password: String): Result<FirebaseUser>
 
     /**
      * Sends an OTP SMS to [phoneNumber] (E.164 format, e.g. "+919876543210").

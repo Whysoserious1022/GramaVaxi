@@ -2,11 +2,15 @@ package com.gramavaxi.presentation.screen.vaccine
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gramavaxi.domain.model.VaccinationSchedule
+import com.gramavaxi.domain.model.VaccineStatus
+import com.gramavaxi.domain.repository.VaccinationRepository
 import com.gramavaxi.domain.usecase.vaccine.GetSchedulesForAnimalUseCase
 import com.gramavaxi.domain.usecase.vaccine.LogVaccinationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 sealed class LogVaccineUiState {
@@ -19,7 +23,8 @@ sealed class LogVaccineUiState {
 @HiltViewModel
 class VaccinationViewModel @Inject constructor(
     private val getSchedulesForAnimalUseCase: GetSchedulesForAnimalUseCase,
-    private val logVaccinationUseCase: LogVaccinationUseCase
+    private val logVaccinationUseCase: LogVaccinationUseCase,
+    private val vaccinationRepository: VaccinationRepository
 ) : ViewModel() {
 
     private val _logUiState = MutableStateFlow<LogVaccineUiState>(LogVaccineUiState.Idle)
@@ -40,6 +45,29 @@ class VaccinationViewModel @Inject constructor(
                 onSuccess = { LogVaccineUiState.Success },
                 onFailure = { LogVaccineUiState.Error(it.message ?: "Failed") }
             )
+        }
+    }
+
+    fun addCustomEvent(animalId: String, animalName: String, eventName: String, date: Long, notes: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            val schedule = VaccinationSchedule(
+                scheduleId = UUID.randomUUID().toString(),
+                animalId = animalId,
+                animalName = animalName,
+                vaccineName = eventName,
+                vaccineType = "Custom",
+                doseNumber = 1,
+                totalDoses = 1,
+                dueDate = date,
+                completedDate = null,
+                status = VaccineStatus.PENDING,
+                notes = notes.ifBlank { null }
+            )
+            val result = vaccinationRepository.saveSchedules(listOf(schedule))
+            if (result.isFailure) {
+                android.util.Log.e("VaccinationViewModel", "Failed to add event: ${result.exceptionOrNull()?.message}")
+            }
+            onSuccess()
         }
     }
 }

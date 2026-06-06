@@ -11,13 +11,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 sealed class AuthUiState {
     object Idle    : AuthUiState()
     object Loading : AuthUiState()
     data class PhoneOtpSent(val verificationId: String) : AuthUiState()
+    data class NeedsRegistration(val user: FirebaseUser) : AuthUiState()
     data class Success(val user: FirebaseUser)           : AuthUiState()
     data class Error(val message: String)               : AuthUiState()
 }
@@ -40,11 +43,36 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             authRepository.signInWithGoogle(idToken)
                 .onSuccess { user ->
-                    persistUserToFirestore(user)
-                    _uiState.value = AuthUiState.Success(user)
+                    checkUserRegistration(user)
                 }
                 .onFailure { e ->
                     _uiState.value = AuthUiState.Error(e.message ?: "Google sign-in failed")
+                }
+        }
+    }
+
+    fun signInWithEmail(email: String, password: String) {
+        _uiState.value = AuthUiState.Loading
+        viewModelScope.launch {
+            authRepository.signInWithEmail(email, password)
+                .onSuccess { user ->
+                    checkUserRegistration(user)
+                }
+                .onFailure { e ->
+                    _uiState.value = AuthUiState.Error(e.message ?: "Sign-in failed")
+                }
+        }
+    }
+
+    fun registerWithEmail(email: String, password: String) {
+        _uiState.value = AuthUiState.Loading
+        viewModelScope.launch {
+            authRepository.signUpWithEmail(email, password)
+                .onSuccess { user ->
+                    _uiState.value = AuthUiState.NeedsRegistration(user)
+                }
+                .onFailure { e ->
+                    _uiState.value = AuthUiState.Error(e.message ?: "Registration failed")
                 }
         }
     }
@@ -65,8 +93,7 @@ class AuthViewModel @Inject constructor(
             },
             onAutoVerified = { user ->
                 viewModelScope.launch {
-                    persistUserToFirestore(user)
-                    _uiState.value = AuthUiState.Success(user)
+                    checkUserRegistration(user)
                 }
             },
             onError = { e ->
@@ -85,8 +112,7 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             authRepository.verifyPhoneOtp(verificationId, otp)
                 .onSuccess { user ->
-                    persistUserToFirestore(user)
-                    _uiState.value = AuthUiState.Success(user)
+                    checkUserRegistration(user)
                 }
                 .onFailure { e ->
                     _uiState.value = AuthUiState.Error(e.message ?: "OTP verification failed")
@@ -107,9 +133,52 @@ class AuthViewModel @Inject constructor(
         val profile = UserProfile(
             uid      = user.uid,
             name     = user.displayName ?: "",
+            email    = user.email ?: "",
             phone    = user.phoneNumber ?: "",
             photoUrl = user.photoUrl?.toString() ?: ""
         )
         userRepository.createOrUpdateUser(profile)
+    }
+
+    private suspend fun checkUserRegistration(user: FirebaseUser) {
+        try {
+            val snapshot = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(user.uid)
+                .get()
+                .await()
+                
+            if (snapshot.exists()) {
+                val name = snapshot.getString("name")
+                if (!name.isNullOrBlank()) {
+                    _uiState.value = AuthUiState.Success(user)
+                    return
+                }
+            }
+            _uiState.value = AuthUiState.NeedsRegistration(user)
+        } catch (e: Exception) {
+            _uiState.value = AuthUiState.Error(e.message ?: "Failed to check registration")
+        }
+    }
+
+    fun signUp(user: FirebaseUser, name: String, village: String, district: String) {
+        _uiState.value = AuthUiState.Loading
+        viewModelScope.launch {
+            val profile = UserProfile(
+                uid = user.uid,
+                name = name,
+                email = user.email ?: "",
+                phone = user.phoneNumber ?: "",
+                village = village,
+                district = district,
+                photoUrl = user.photoUrl?.toString() ?: ""
+            )
+            val result = userRepository.createOrUpdateUser(profile)
+            if (result.isSuccess) {
+                _uiState.value = AuthUiState.Success(user)
+            } else {
+                _uiState.value = AuthUiState.Error(result.exceptionOrNull()?.message ?: "Failed to save profile")
+            }
+        }
     }
 }

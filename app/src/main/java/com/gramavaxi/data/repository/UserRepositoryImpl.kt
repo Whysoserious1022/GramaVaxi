@@ -1,6 +1,7 @@
 package com.gramavaxi.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.gramavaxi.domain.model.UserProfile
 import com.gramavaxi.domain.repository.UserRepository
 import kotlinx.coroutines.channels.awaitClose
@@ -21,7 +22,8 @@ class UserRepositoryImpl @Inject constructor(
             userDoc(profile.uid).set(
                 profile.toMap().toMutableMap().also {
                     it["lastLoginAt"] = System.currentTimeMillis()
-                }
+                },
+                SetOptions.merge()
             ).await()
             Result.success(Unit)
         } catch (e: Exception) {
@@ -40,5 +42,14 @@ class UserRepositoryImpl @Inject constructor(
             trySend(data?.let { UserProfile.fromMap(uid, it) })
         }
         awaitClose { listener.remove() }
+    }
+
+    override suspend fun updatePhotoUrl(uid: String, photoUrl: String): Result<Unit> {
+        return try {
+            userDoc(uid).update("photoUrl", photoUrl).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }

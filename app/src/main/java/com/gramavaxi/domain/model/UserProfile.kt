@@ -6,6 +6,7 @@ package com.gramavaxi.domain.model
 data class UserProfile(
     val uid: String = "",
     val name: String = "",
+    val email: String = "",
     val phone: String = "",
     val village: String = "",
     val district: String = "",
@@ -21,6 +22,7 @@ data class UserProfile(
         fun fromMap(uid: String, map: Map<String, Any?>): UserProfile = UserProfile(
             uid         = uid,
             name        = map["name"] as? String ?: "",
+            email       = map["email"] as? String ?: "",
             phone       = map["phone"] as? String ?: "",
             village     = map["village"] as? String ?: "",
             district    = map["district"] as? String ?: "",
@@ -33,6 +35,7 @@ data class UserProfile(
 
     fun toMap(): Map<String, Any> = mapOf(
         "name"        to name,
+        "email"       to email,
         "phone"       to phone,
         "village"     to village,
         "district"    to district,

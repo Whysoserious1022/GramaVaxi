@@ -2,7 +2,6 @@ package com.gramavaxi.presentation.screen.onboarding
 
 import android.app.Activity
 import android.util.Log
-import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
@@ -18,6 +17,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
@@ -33,7 +33,9 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.credentials.CustomCredential
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.gramavaxi.presentation.theme.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -43,7 +45,7 @@ import kotlinx.coroutines.launch
 // ─────────────────────────────────────────────────────────────────────────────
 @Composable
 fun SplashScreen(
-    onNavigateToLanguageSelect: () -> Unit,
+    onNavigateToLogin: () -> Unit,
     onNavigateToDashboard: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
@@ -71,7 +73,7 @@ fun SplashScreen(
         if (viewModel.isLoggedIn()) {
             onNavigateToDashboard()
         } else {
-            onNavigateToLanguageSelect()
+            onNavigateToLogin()
         }
     }
 
@@ -112,13 +114,17 @@ fun SplashScreen(
         ) {
             Box(
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(120.dp)
                     .clip(RoundedCornerShape(28.dp))
                     .background(Color.White.copy(alpha = 0.12f))
                     .border(1.dp, Color.White.copy(alpha = 0.2f), RoundedCornerShape(28.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Text("🐄", fontSize = 52.sp)
+                androidx.compose.foundation.Image(
+                    painter = androidx.compose.ui.res.painterResource(id = com.gramavaxi.R.drawable.grama_vaxi_logo),
+                    contentDescription = "Grama-Vaxi Logo",
+                    modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(28.dp))
+                )
             }
             Spacer(Modifier.height(24.dp))
             Text(
@@ -271,21 +277,24 @@ fun LanguageSelectScreen(onLanguageSelected: () -> Unit) {
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
+    onNavigateToSignUp: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
-    val activity = LocalActivity.current
+    val activity = LocalContext.current as? Activity
 
-    var phoneNumber by remember { mutableStateOf("") }
-    var otp by remember { mutableStateOf("") }
-    var verificationId by remember { mutableStateOf<String?>(null) }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var isLoginMode by remember { mutableStateOf(true) }
     var snackbarMessage by remember { mutableStateOf<String?>(null) }
+    var verificationId by remember { mutableStateOf<String?>(null) }
 
     // React to state changes
     LaunchedEffect(uiState) {
         when (val s = uiState) {
             is AuthUiState.Success           -> onLoginSuccess()
+            is AuthUiState.NeedsRegistration -> onNavigateToSignUp()
             is AuthUiState.PhoneOtpSent      -> verificationId = s.verificationId
             is AuthUiState.Error             -> { snackbarMessage = s.message; viewModel.clearError() }
             else                             -> Unit
@@ -319,11 +328,17 @@ fun LoginScreen(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(76.dp)
+                        .size(86.dp)
                         .clip(RoundedCornerShape(20.dp))
                         .background(Color.White.copy(0.12f)),
                     contentAlignment = Alignment.Center
-                ) { Text("🐄", fontSize = 38.sp) }
+                ) { 
+                    androidx.compose.foundation.Image(
+                        painter = androidx.compose.ui.res.painterResource(id = com.gramavaxi.R.drawable.grama_vaxi_logo),
+                        contentDescription = "Grama-Vaxi Logo",
+                        modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(20.dp))
+                    )
+                }
                 Spacer(Modifier.height(12.dp))
                 Text(
                     "Grama-Vaxi",
@@ -357,158 +372,119 @@ fun LoginScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    if (verificationId != null) "Enter OTP" else "Sign In to Continue",
+                    if (isLoginMode) "Sign In to Continue" else "Create an Account",
                     style = MaterialTheme.typography.headlineSmall,
                     color = Primary,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    if (verificationId != null)
-                        "OTP sent to +91 $phoneNumber"
-                    else
-                        "Access your livestock health records",
+                    "Access your livestock health records",
                     style = MaterialTheme.typography.bodyMedium,
                     color = OnSurfaceVariant
                 )
 
                 Spacer(Modifier.height(4.dp))
 
-                if (verificationId == null) {
-                    // ── Google Sign-In Button ──────────────────────────────
-                    GoogleSignInButton(
-                        isLoading = uiState is AuthUiState.Loading,
-                        onClick = {
-                            scope.launch {
-                                launchGoogleSignIn(activity) { idToken ->
-                                    viewModel.signInWithGoogle(idToken)
-                                }
+                // ── Google Sign-In Button ──────────────────────────────
+                GoogleSignInButton(
+                    isLoading = uiState is AuthUiState.Loading,
+                    onClick = {
+                        scope.launch {
+                            launchGoogleSignIn(activity) { idToken ->
+                                viewModel.signInWithGoogle(idToken)
                             }
                         }
-                    )
+                    }
+                )
 
-                    // ── Divider ─────────────────────────────────────────────
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Divider(modifier = Modifier.weight(1f), color = OutlineVariant)
-                        Text(
-                            "  or continue with phone  ",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = OnSurfaceVariant
+                // ── Divider ─────────────────────────────────────────────
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Divider(modifier = Modifier.weight(1f), color = OutlineVariant)
+                    Text(
+                        "  or continue with email  ",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = OnSurfaceVariant
+                    )
+                    Divider(modifier = Modifier.weight(1f), color = OutlineVariant)
+                }
+
+                // ── Email Field ─────────────────────────────────────────
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email Address") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Secondary,
+                        focusedLabelColor  = Secondary,
+                        cursorColor        = Secondary
+                    ),
+                    singleLine = true
+                )
+
+                // ── Password Field ──────────────────────────────────────
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Secondary,
+                        focusedLabelColor  = Secondary,
+                        cursorColor        = Secondary
+                    ),
+                    singleLine = true
+                )
+
+                Button(
+                    onClick = {
+                        if (isLoginMode) {
+                            viewModel.signInWithEmail(email.trim(), password.trim())
+                        } else {
+                            viewModel.registerWithEmail(email.trim(), password.trim())
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(54.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                    enabled = email.isNotBlank() && password.length >= 6 && uiState !is AuthUiState.Loading
+                ) {
+                    if (uiState is AuthUiState.Loading) {
+                        CircularProgressIndicator(
+                            color = Color.White,
+                            strokeWidth = 2.dp,
+                            modifier = Modifier.size(22.dp)
                         )
-                        Divider(modifier = Modifier.weight(1f), color = OutlineVariant)
-                    }
-
-                    // ── Phone Field ─────────────────────────────────────────
-                    OutlinedTextField(
-                        value = phoneNumber,
-                        onValueChange = { if (it.length <= 10) phoneNumber = it },
-                        label = { Text("Mobile Number") },
-                        placeholder = { Text("10-digit number") },
-                        leadingIcon = {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(start = 12.dp)
-                            ) {
-                                Text("+91", fontWeight = FontWeight.Bold, color = Primary)
-                                Spacer(Modifier.width(8.dp))
-                                Divider(
-                                    modifier = Modifier
-                                        .height(24.dp)
-                                        .width(1.dp),
-                                    color = OutlineVariant
-                                )
-                                Spacer(Modifier.width(8.dp))
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Secondary,
-                            focusedLabelColor  = Secondary,
-                            cursorColor        = Secondary
-                        ),
-                        singleLine = true
-                    )
-
-                    Button(
-                        onClick = { viewModel.sendPhoneOtp(phoneNumber, activity!!) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(54.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                        enabled = phoneNumber.length == 10 && uiState !is AuthUiState.Loading
-                    ) {
-                        if (uiState is AuthUiState.Loading) {
-                            CircularProgressIndicator(
-                                color = Color.White,
-                                strokeWidth = 2.dp,
-                                modifier = Modifier.size(22.dp)
-                            )
-                        } else {
-                            Icon(Icons.Default.Phone, null, modifier = Modifier.size(18.dp))
-                            Spacer(Modifier.width(8.dp))
-                            Text(
-                                "Send OTP",
-                                style = MaterialTheme.typography.labelLarge,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-
-                } else {
-                    // ── OTP Input ───────────────────────────────────────────
-                    OutlinedTextField(
-                        value = otp,
-                        onValueChange = { if (it.length <= 6) otp = it },
-                        label = { Text("6-digit OTP") },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Secondary,
-                            focusedLabelColor  = Secondary,
-                            cursorColor        = Secondary
-                        ),
-                        singleLine = true
-                    )
-
-                    Button(
-                        onClick = { viewModel.verifyOtp(verificationId!!, otp) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(54.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                        enabled = otp.length == 6 && uiState !is AuthUiState.Loading
-                    ) {
-                        if (uiState is AuthUiState.Loading) {
-                            CircularProgressIndicator(
-                                color = Color.White,
-                                strokeWidth = 2.dp,
-                                modifier = Modifier.size(22.dp)
-                            )
-                        } else {
-                            Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(18.dp))
-                            Spacer(Modifier.width(8.dp))
-                            Text(
-                                "Verify OTP",
-                                style = MaterialTheme.typography.labelLarge,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-
-                    TextButton(
-                        onClick = { verificationId = null; otp = "" },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("← Change Number", color = Primary)
+                    } else {
+                        Text(
+                            if (isLoginMode) "Sign In" else "Sign Up",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
+
+                TextButton(
+                    onClick = { isLoginMode = !isLoginMode },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        if (isLoginMode) "Don't have an account? Sign Up" else "Already have an account? Sign In",
+                        color = Primary
+                    )
+                }
+
+                if (verificationId == null) {
+
 
                 // Snackbar replacement — inline error
                 snackbarMessage?.let { msg ->
@@ -531,6 +507,7 @@ fun LoginScreen(
             }
         }
     }
+}
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -597,8 +574,9 @@ private suspend fun launchGoogleSignIn(
         val result = credentialManager.getCredential(activity, request)
         val credential = result.credential
 
-        if (credential is com.google.android.libraries.identity.googleid.GoogleIdTokenCredential) {
-            onToken(credential.idToken)
+        if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+            onToken(googleIdTokenCredential.idToken)
         }
     } catch (e: GetCredentialException) {
         Log.e("GoogleSignIn", "Credential error: ${e.message}")
@@ -611,4 +589,136 @@ private suspend fun launchGoogleSignIn(
  * YOUR WEB CLIENT ID — paste the client_id from the oauth_client section
  * (client_type = 3) in your newly downloaded google-services.json here:
  */
-private const val WEB_CLIENT_ID = "YOUR_WEB_CLIENT_ID_HERE"
+private const val WEB_CLIENT_ID = "994276855305-si1k9jabd7b6qfrid80065usv1beqcj0.apps.googleusercontent.com"
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SIGN UP SCREEN
+// ─────────────────────────────────────────────────────────────────────────────
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SignUpScreen(
+    onSignUpSuccess: () -> Unit,
+    viewModel: AuthViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    
+    var name by remember { mutableStateOf("") }
+    var village by remember { mutableStateOf("") }
+    var district by remember { mutableStateOf("") }
+    var snackbarMessage by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(uiState) {
+        when (val s = uiState) {
+            is AuthUiState.Success -> onSignUpSuccess()
+            is AuthUiState.Error -> { snackbarMessage = s.message; viewModel.clearError() }
+            else -> Unit
+        }
+    }
+
+    // Must be in NeedsRegistration state to get the FirebaseUser
+    val user = remember { (uiState as? AuthUiState.NeedsRegistration)?.user }
+    if (user == null) return // Failsafe, but should not happen once registered
+
+    Box(modifier = Modifier.fillMaxSize().background(Background)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.3f)
+                .background(Brush.verticalGradient(listOf(Primary, PrimaryContainer, Color(0xFF2E6B4F))))
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(top = 48.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    "Complete Profile",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color.White,
+                    fontWeight = FontWeight.ExtraBold
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 32.dp),
+            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp, bottomStart = 24.dp, bottomEnd = 24.dp),
+            colors = CardDefaults.cardColors(containerColor = SurfaceContainerLowest),
+            elevation = CardDefaults.cardElevation(12.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 28.dp, vertical = 32.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Full Name") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Secondary,
+                        focusedLabelColor  = Secondary
+                    ),
+                    singleLine = true
+                )
+
+                OutlinedTextField(
+                    value = village,
+                    onValueChange = { village = it },
+                    label = { Text("Village Name") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Secondary,
+                        focusedLabelColor  = Secondary
+                    ),
+                    singleLine = true
+                )
+
+                OutlinedTextField(
+                    value = district,
+                    onValueChange = { district = it },
+                    label = { Text("District") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Secondary,
+                        focusedLabelColor  = Secondary
+                    ),
+                    singleLine = true
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                Button(
+                    onClick = { viewModel.signUp(user, name, village, district) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(54.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                    enabled = name.isNotBlank() && village.isNotBlank() && district.isNotBlank() && uiState !is AuthUiState.Loading
+                ) {
+                    if (uiState is AuthUiState.Loading) {
+                        CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = Modifier.size(22.dp))
+                    } else {
+                        Text("Create Profile", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+                    }
+                }
+
+                snackbarMessage?.let { msg ->
+                    Card(colors = CardDefaults.cardColors(containerColor = ErrorContainer), shape = RoundedCornerShape(12.dp)) {
+                        Text(msg, modifier = Modifier.padding(12.dp), style = MaterialTheme.typography.bodySmall, color = OnErrorContainer)
+                    }
+                    LaunchedEffect(msg) { delay(4000); snackbarMessage = null }
+                }
+            }
+        }
+    }
+}

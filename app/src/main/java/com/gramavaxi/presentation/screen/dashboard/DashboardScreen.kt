@@ -27,8 +27,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gramavaxi.domain.model.VaccinationSchedule
 import com.gramavaxi.presentation.theme.*
+import com.gramavaxi.util.LanguageManager
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,13 +45,17 @@ fun DashboardScreen(
     onNavigateToAnimalProfile: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val currentLocale by LanguageManager.currentLocale.collectAsState()
 
     Scaffold(
         topBar = {
             DashboardTopBar(
                 userName = uiState.firstName,
                 alertCount = uiState.unreadAlertCount,
-                onAlertsClick = onNavigateToAlerts
+                onAlertsClick = onNavigateToAlerts,
+                currentLocale = currentLocale,
+                onLanguageToggle = { LanguageManager.toggle(context) }
             )
         },
         containerColor = Background
@@ -93,7 +99,10 @@ fun DashboardScreen(
                 if (uiState.upcomingVaccinations.isNotEmpty()) {
                     item { SectionTitle("📅 Due This Week") }
                     items(uiState.upcomingVaccinations.take(5)) { schedule ->
-                        VaccinationCard(schedule = schedule)
+                        VaccinationCard(
+                            schedule = schedule,
+                            onMarkDone = { viewModel.markVaccinationDone(schedule.scheduleId) }
+                        )
                     }
                 }
 
@@ -101,12 +110,17 @@ fun DashboardScreen(
                 if (uiState.overdueVaccinations.isNotEmpty()) {
                     item {
                         SectionTitle(
-                            "🚨 Overdue",
+                            "🚨 Immediate Action Needed",
                             titleColor = Error
                         )
                     }
                     items(uiState.overdueVaccinations.take(3)) { schedule ->
-                        VaccinationCard(schedule = schedule, isOverdue = true)
+                        VaccinationCard(
+                            schedule = schedule,
+                            isOverdue = true,
+                            onReportIssue = onNavigateToAlerts,
+                            onMarkDone = { viewModel.markVaccinationDone(schedule.scheduleId) }
+                        )
                     }
                 }
 
@@ -131,7 +145,9 @@ fun DashboardScreen(
 private fun DashboardTopBar(
     userName: String,
     alertCount: Int,
-    onAlertsClick: () -> Unit
+    onAlertsClick: () -> Unit,
+    currentLocale: String = "en",
+    onLanguageToggle: () -> Unit = {}
 ) {
     TopAppBar(
         title = {
@@ -154,8 +170,13 @@ private fun DashboardTopBar(
         actions = {
             // Language toggle chip
             AssistChip(
-                onClick = { /* toggle language */ },
-                label = { Text("EN/KN", style = MaterialTheme.typography.labelMedium) },
+                onClick = onLanguageToggle,
+                label = {
+                    Text(
+                        if (currentLocale == "en") "EN → ಕನ್ನಡ" else "KN → English",
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                },
                 colors = AssistChipDefaults.assistChipColors(
                     containerColor = PrimaryContainer.copy(0.25f)
                 ),
@@ -246,7 +267,7 @@ private fun HealthSnapshotGrid(uiState: DashboardUiState) {
                 ) {
                     Column {
                         Text(
-                            "Total Animals",
+                            androidx.compose.ui.res.stringResource(com.gramavaxi.R.string.total_animals),
                             style = MaterialTheme.typography.labelLarge,
                             color = Color.White.copy(0.8f)
                         )
@@ -385,10 +406,10 @@ private fun QuickActionsGrid(
     onAnalytics: () -> Unit
 ) {
     val actions = listOf(
-        QuickAction("Register\nAnimal",   Icons.Default.AddBox,        Primary,    onRegisterAnimal),
-        QuickAction("Report\nSickness",   Icons.Default.ReportProblem, Error,      onReportSickness),
-        QuickAction("Find Vet\nCamp",     Icons.Default.LocalHospital,  Secondary,  onFindVet),
-        QuickAction("Analytics",          Icons.Default.BarChart,       Tertiary,   onAnalytics)
+        QuickAction(androidx.compose.ui.res.stringResource(com.gramavaxi.R.string.register_animal),   Icons.Default.AddBox,        Primary,    onRegisterAnimal),
+        QuickAction(androidx.compose.ui.res.stringResource(com.gramavaxi.R.string.report_outbreak),   Icons.Default.ReportProblem, Error,      onReportSickness),
+        QuickAction(androidx.compose.ui.res.stringResource(com.gramavaxi.R.string.find_vet),     Icons.Default.LocalHospital,  Secondary,  onFindVet),
+        QuickAction(androidx.compose.ui.res.stringResource(com.gramavaxi.R.string.analytics),Icons.Default.BarChart,       Tertiary,   onAnalytics)
     )
 
     Row(
@@ -429,8 +450,44 @@ private fun QuickActionsGrid(
 }
 
 @Composable
-private fun VaccinationCard(schedule: VaccinationSchedule, isOverdue: Boolean = false) {
+private fun VaccinationCard(
+    schedule: VaccinationSchedule,
+    isOverdue: Boolean = false,
+    onReportIssue: (() -> Unit)? = null,
+    onMarkDone: (() -> Unit)? = null
+) {
     val dateFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+    var showMarkDoneDialog by remember { mutableStateOf(false) }
+
+    // Confirmation dialog
+    if (showMarkDoneDialog) {
+        AlertDialog(
+            onDismissRequest = { showMarkDoneDialog = false },
+            icon = { Icon(Icons.Default.CheckCircle, null, tint = Primary) },
+            title = { Text("Mark as Done?", fontWeight = FontWeight.Bold) },
+            text = {
+                Text(
+                    "Mark ${schedule.vaccineName} for ${schedule.animalName} as completed today?",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showMarkDoneDialog = false
+                        onMarkDone?.invoke()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                    shape = RoundedCornerShape(10.dp)
+                ) { Text("Mark Done ✓") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showMarkDoneDialog = false }) { Text("Cancel") }
+            },
+            shape = RoundedCornerShape(20.dp)
+        )
+    }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -439,68 +496,100 @@ private fun VaccinationCard(schedule: VaccinationSchedule, isOverdue: Boolean = 
         ),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(CircleShape)
-                    .background(if (isOverdue) Error else PrimaryContainer),
-                contentAlignment = Alignment.Center
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Icon(
-                    Icons.Default.Vaccines,
-                    null,
-                    tint = Color.White,
-                    modifier = Modifier.size(22.dp)
-                )
-            }
-            Column(Modifier.weight(1f)) {
-                Text(
-                    schedule.animalName,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = if (isOverdue) OnErrorContainer else OnSurface
-                )
-                Text(
-                    schedule.vaccineName,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = OnSurfaceVariant
-                )
-            }
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    dateFormat.format(Date(schedule.dueDate)),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = if (isOverdue) Error else OnSurfaceVariant
-                )
-                if (isOverdue) {
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .background(if (isOverdue) Error else PrimaryContainer),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.Vaccines,
+                        null,
+                        tint = Color.White,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+                Column(Modifier.weight(1f)) {
                     Text(
-                        "OVERDUE",
+                        schedule.animalName,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = if (isOverdue) OnErrorContainer else OnSurface
+                    )
+                    Text(
+                        schedule.vaccineName,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = OnSurfaceVariant
+                    )
+                }
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        dateFormat.format(Date(schedule.dueDate)),
                         style = MaterialTheme.typography.labelSmall,
-                        color = Error,
-                        fontWeight = FontWeight.Bold
+                        color = if (isOverdue) Error else OnSurfaceVariant
                     )
-                } else {
-                    AssistChip(
-                        onClick = {},
-                        label = {
-                            Text("DUE SOON", style = MaterialTheme.typography.labelSmall, fontSize = 9.sp)
-                        },
-                        colors = AssistChipDefaults.assistChipColors(
-                            containerColor = SecondaryContainer.copy(0.7f)
-                        ),
-                        border = null,
-                        modifier = Modifier.height(22.dp)
-                    )
+                    if (isOverdue) {
+                        Text(
+                            "OVERDUE",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Error,
+                            fontWeight = FontWeight.Bold
+                        )
+                    } else {
+                        AssistChip(
+                            onClick = {},
+                            label = {
+                                Text("DUE SOON", style = MaterialTheme.typography.labelSmall, fontSize = 9.sp)
+                            },
+                            colors = AssistChipDefaults.assistChipColors(
+                                containerColor = SecondaryContainer.copy(0.7f)
+                            ),
+                            border = null,
+                            modifier = Modifier.height(22.dp)
+                        )
+                    }
+                }
+            }
+            // Action row
+            if (onMarkDone != null || onReportIssue != null) {
+                Spacer(Modifier.height(10.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (onMarkDone != null) {
+                        Button(
+                            onClick = { showMarkDoneDialog = true },
+                            colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                            modifier = Modifier.height(30.dp),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(14.dp))
+                            Spacer(Modifier.width(4.dp))
+                            Text("Mark Done", style = MaterialTheme.typography.labelSmall, fontSize = 11.sp)
+                        }
+                    }
+                    if (onReportIssue != null && isOverdue) {
+                        OutlinedButton(
+                            onClick = onReportIssue,
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                            modifier = Modifier.height(30.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            border = BorderStroke(1.dp, Error)
+                        ) {
+                            Text("Report Issue", style = MaterialTheme.typography.labelSmall, fontSize = 11.sp, color = Error)
+                        }
+                    }
                 }
             }
         }
     }
 }
+
 
 @Composable
 private fun EmptyStateCard(onRegister: () -> Unit) {

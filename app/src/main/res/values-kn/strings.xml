@@ -1,49 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ಗ್ರಾಮ-ವ್ಯಾಕ್ಸಿ</string>
 
     <!-- Onboarding -->
     <string name="select_language">ಭಾಷೆ ಆಯ್ಕೆ ಮಾಡಿ</string>
-    <string name="login_title">ಮೊಬೈಲ್‌ನಿಂದ ಲಾಗಿನ್ ಮಾಡಿ</string>
+    <string name="login_title">ಮೊಬೈಲ್ ಮೂಲಕ ಲಾಗಿನ್</string>
     <string name="enter_otp">OTP ನಮೂದಿಸಿ</string>
     <string name="send_otp">OTP ಕಳುಹಿಸಿ</string>
     <string name="verify_otp">OTP ಪರಿಶೀಲಿಸಿ</string>
-    <string name="mobile_number">ಮೊಬೈಲ್ ನಂಬರ್</string>
+    <string name="mobile_number">ಮೊಬೈಲ್ ಸಂಖ್ಯೆ</string>
+    <string name="sign_up_title">ಪ್ರೊಫೈಲ್ ಪೂರ್ಣಗೊಳಿಸಿ</string>
+    <string name="full_name">ಪೂರ್ಣ ಹೆಸರು</string>
+    <string name="create_profile">ಪ್ರೊಫೈಲ್ ರಚಿಸಿ</string>
 
     <!-- Dashboard -->
     <string name="dashboard_title">ಗ್ರಾಮ-ವ್ಯಾಕ್ಸಿ</string>
-    <string name="total_animals">ಒಟ್ಟು ಜಾನುವಾರು</string>
+    <string name="total_animals">ಒಟ್ಟು ಪ್ರಾಣಿಗಳು</string>
     <string name="healthy">ಆರೋಗ್ಯಕರ</string>
     <string name="need_care">ಆರೈಕೆ ಬೇಕು</string>
-    <string name="upcoming_this_week">ಈ ವಾರ ಬರಲಿರುವ ಲಸಿಕೆ</string>
-    <string name="overdue_vaccinations">ತಡವಾದ ಲಸಿಕೆಗಳು</string>
+    <string name="upcoming_this_week">ಈ ವಾರ ನಿರ್ಧಾರಿತ</string>
+    <string name="overdue_vaccinations">ತಡೆದ ಲಸಿಕೆಗಳು</string>
     <string name="quick_actions">ತ್ವರಿತ ಕ್ರಿಯೆಗಳು</string>
-    <string name="my_animals">ನನ್ನ ಜಾನುವಾರು</string>
+    <string name="my_animals">ನನ್ನ ಪ್ರಾಣಿಗಳು</string>
     <string name="ai_doctor">AI ವೈದ್ಯ</string>
-    <string name="find_vet">ಪಶು ವೈದ್ಯ ಹುಡುಕಿ</string>
+    <string name="find_vet">ಪಶು ಆಸ್ಪತ್ರೆ ಹುಡುಕಿ</string>
     <string name="analytics">ವಿಶ್ಲೇಷಣೆ</string>
 
     <!-- Animal -->
-    <string name="register_animal">ಜಾನುವಾರು ನೋಂದಣಿ</string>
-    <string name="animal_name">ಜಾನುವಾರು ಹೆಸರು</string>
-    <string name="species">ಪ್ರಜಾತಿ</string>
+    <string name="register_animal">ಪ್ರಾಣಿ ನೋಂದಾಯಿಸಿ</string>
+    <string name="animal_name">ಪ್ರಾಣಿಯ ಹೆಸರು</string>
+    <string name="species">ಜಾತಿ</string>
     <string name="breed">ತಳಿ</string>
     <string name="age_months">ವಯಸ್ಸು (ತಿಂಗಳು)</string>
     <string name="sex">ಲಿಂಗ</string>
     <string name="owner_name">ಮಾಲೀಕರ ಹೆಸರು</string>
-    <string name="owner_phone">ಮೊಬೈಲ್ ನಂಬರ್</string>
+    <string name="owner_phone">ಮೊಬೈಲ್ ಸಂಖ್ಯೆ</string>
     <string name="village_name">ಗ್ರಾಮದ ಹೆಸರು</string>
     <string name="district">ಜಿಲ್ಲೆ</string>
     <string name="notes_optional">ಟಿಪ್ಪಣಿಗಳು (ಐಚ್ಛಿಕ)</string>
-    <string name="register_and_generate">ನೋಂದಣಿ ಮಾಡಿ ಮತ್ತು ವೇಳಾಪಟ್ಟಿ ರಚಿಸಿ</string>
+    <string name="register_and_generate">ನೋಂದಾಯಿಸಿ &amp; ವೇಳಾಪಟ್ಟಿ ರಚಿಸಿ</string>
 
     <!-- AI Chat -->
     <string name="ai_chat_title">ಗ್ರಾಮ-ವ್ಯಾಕ್ಸಿ AI</string>
-    <string name="type_or_speak">ಮಾತನಾಡಿ ಅಥವಾ ಟೈಪ್ ಮಾಡಿ…</string>
-    <string name="thinking">ಯೋಚಿಸುತ್ತಿದ್ದೇನೆ…</string>
+    <string name="type_or_speak">ಪ್ರಶ್ನೆ ಟೈಪ್ ಮಾಡಿ ಅಥವಾ ಮಾತನಾಡಿ…</string>
+    <string name="thinking">ಯೋಚಿಸುತ್ತಿದೆ…</string>
 
     <!-- Alerts -->
     <string name="alerts_title">ರೋಗ ಎಚ್ಚರಿಕೆಗಳು</string>
-    <string name="report_outbreak">ರೋಗ ಪ್ರಾದುರ್ಭಾವ ವರದಿ ಮಾಡಿ</string>
+    <string name="report_outbreak">ರೋಗ ವರದಿ ಮಾಡಿ</string>
 
     <!-- Common -->
     <string name="back">ಹಿಂದೆ</string>
@@ -51,13 +55,13 @@
     <string name="cancel">ರದ್ದು</string>
     <string name="ok">ಸರಿ</string>
     <string name="loading">ಲೋಡ್ ಆಗುತ್ತಿದೆ…</string>
-    <string name="error_generic">ತಪ್ಪಾಗಿದೆ. ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ.</string>
+    <string name="error_generic">ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.</string>
     <string name="no_internet">ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕ ಇಲ್ಲ</string>
     <string name="offline_mode">ಆಫ್‌ಲೈನ್ ಮೋಡ್ – ಆನ್‌ಲೈನ್ ಆದಾಗ ಸಿಂಕ್ ಆಗುತ್ತದೆ</string>
 
     <!-- Vaccine Status -->
-    <string name="status_pending">ಬಾಕಿ</string>
-    <string name="status_completed">ಮಾಡಲ್ಪಟ್ಟಿದೆ</string>
+    <string name="status_pending">ಬಾಕಿ ಇದೆ</string>
+    <string name="status_completed">ಪೂರ್ಣಗೊಂಡಿದೆ</string>
     <string name="status_overdue">ತಡವಾಗಿದೆ</string>
-    <string name="status_skipped">ಬಿಡಲಾಗಿದೆ</string>
+    <string name="status_skipped">ಬಿಟ್ಟುಬಿಡಲಾಗಿದೆ</string>
 </resources>

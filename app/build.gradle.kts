@@ -97,6 +97,9 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
 
+    // AppCompat (for locale switching)
+    implementation("androidx.appcompat:appcompat:1.7.0")
+
     // Hilt DI
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
@@ -127,6 +130,7 @@ dependencies {
 
     // Maps
     implementation(libs.play.services.maps)
+    implementation(libs.maps.compose)
     implementation(libs.play.services.location)
 
     // Google Sign-In / Credential Manager

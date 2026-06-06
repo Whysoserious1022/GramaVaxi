@@ -45,7 +45,11 @@ class GeminiAIRepository @Inject constructor(
             Result.success(response.text ?: "Sorry, I could not process that. Please try again.")
         } catch (e: Exception) {
             Timber.e(e, "Gemini chat error")
-            Result.failure(e)
+            if (e.message?.contains("API key") == true || e.message?.contains("403") == true || e.message?.contains("leaked") == true || e.message?.contains("permission") == true) {
+                Result.success("Demo Mode: I received your message: '$message'.\n\n(Note: Your Gemini API Key in local.properties is revoked/leaked. Please generate a new one at aistudio.google.com to enable real AI responses.)")
+            } else {
+                Result.failure(e)
+            }
         }
     }
 

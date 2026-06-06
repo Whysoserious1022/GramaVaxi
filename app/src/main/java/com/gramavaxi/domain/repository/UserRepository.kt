@@ -9,4 +9,7 @@ interface UserRepository {
 
     /** Returns a real-time Flow of the user profile for [uid]. */
     fun getUserProfile(uid: String): Flow<UserProfile?>
+    
+    /** Updates the user's photo URL. */
+    suspend fun updatePhotoUrl(uid: String, photoUrl: String): Result<Unit>
 }

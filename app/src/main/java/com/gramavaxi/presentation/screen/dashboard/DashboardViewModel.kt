@@ -9,6 +9,7 @@ import com.gramavaxi.domain.repository.UserRepository
 import com.gramavaxi.domain.usecase.animal.GetAllAnimalsUseCase
 import com.gramavaxi.domain.usecase.vaccine.GetUpcomingVaccinationsUseCase
 import com.gramavaxi.domain.usecase.vaccine.GetOverdueVaccinationsUseCase
+import com.gramavaxi.domain.usecase.vaccine.LogVaccinationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -36,6 +37,7 @@ class DashboardViewModel @Inject constructor(
     private val getAllAnimalsUseCase: GetAllAnimalsUseCase,
     private val getUpcomingVaccinationsUseCase: GetUpcomingVaccinationsUseCase,
     private val getOverdueVaccinationsUseCase: GetOverdueVaccinationsUseCase,
+    private val logVaccinationUseCase: LogVaccinationUseCase,
     private val userRepository: UserRepository,
     private val firebaseAuth: FirebaseAuth
 ) : ViewModel() {
@@ -92,5 +94,29 @@ class DashboardViewModel @Inject constructor(
     fun refresh() {
         _uiState.update { it.copy(isLoading = true) }
         loadDashboard()
+    }
+
+    fun updateProfilePhoto(photoUrl: String) {
+        val uid = firebaseAuth.currentUser?.uid ?: return
+        viewModelScope.launch {
+            userRepository.updatePhotoUrl(uid, photoUrl)
+            _uiState.update { it.copy(userPhotoUrl = photoUrl) }
+        }
+    }
+
+    fun markVaccinationDone(scheduleId: String) {
+        viewModelScope.launch {
+            try {
+                logVaccinationUseCase(
+                    scheduleId = scheduleId,
+                    completedDate = System.currentTimeMillis(),
+                    batchNumber = null,
+                    notes = "Marked done from dashboard"
+                )
+                // Refresh overdue list
+                val overdue = getOverdueVaccinationsUseCase()
+                _uiState.update { it.copy(overdueVaccinations = overdue) }
+            } catch (_: Exception) {}
+        }
     }
 }

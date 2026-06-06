@@ -23,6 +23,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +38,9 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
+// ─────────────────────────────────────────────────────────────────────────────
+// AI CHAT SCREEN
+// ─────────────────────────────────────────────────────────────────────────────
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AIChatScreen(
@@ -50,21 +55,15 @@ fun AIChatScreen(
     var isListening by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    // Permission launcher for audio
     val audioPermission = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) isListening = true
-    }
+    ) { granted -> if (granted) isListening = true }
 
-    // Speech recognizer
     val speechRecognizer = remember { SpeechRecognizer.createSpeechRecognizer(context) }
 
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
-            coroutineScope.launch {
-                listState.animateScrollToItem(messages.size - 1)
-            }
+            coroutineScope.launch { listState.animateScrollToItem(messages.size - 1) }
         }
     }
 
@@ -76,33 +75,28 @@ fun AIChatScreen(
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Back", tint = Color.White)
-                    }
+                    IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Back") }
                 },
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .background(Color.White.copy(0.2f), CircleShape),
+                            modifier = Modifier.size(38.dp).clip(CircleShape).background(PrimaryContainer.copy(0.1f)),
                             contentAlignment = Alignment.Center
-                        ) {
-                            Text("🤖", fontSize = 20.sp)
-                        }
-                        Spacer(Modifier.width(10.dp))
+                        ) { Text("🤖", fontSize = 20.sp) }
+                        Spacer(Modifier.width(12.dp))
                         Column {
-                            Text("Grama-Vaxi AI", style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.Bold)
-                            Text("Livestock Health Assistant", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(0.8f))
+                            Text("Grama AI", style = MaterialTheme.typography.titleMedium, color = Primary, fontWeight = FontWeight.Bold)
+                            Text("Health Assistant", style = MaterialTheme.typography.labelSmall, color = OnSurfaceVariant)
                         }
                     }
                 },
                 actions = {
                     IconButton(onClick = { viewModel.clearChat() }) {
-                        Icon(Icons.Default.Refresh, "Clear", tint = Color.White)
+                        Icon(Icons.Default.DeleteSweep, "Clear", tint = OnSurfaceVariant)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = GreenMedium)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = SurfaceContainerLowest),
+                modifier = Modifier.shadow(2.dp)
             )
         },
         bottomBar = {
@@ -119,30 +113,29 @@ fun AIChatScreen(
                 onVoiceClick = {
                     audioPermission.launch(Manifest.permission.RECORD_AUDIO)
                     startVoiceRecognition(speechRecognizer, context) { result ->
-                        inputText = result
+                        if (result.isNotBlank()) {
+                            inputText = result
+                            viewModel.sendMessage(result)
+                            inputText = ""
+                        }
                         isListening = false
                     }
-                    isListening = true
                 }
             )
-        }
+        },
+        containerColor = Background
     ) { padding ->
         LazyColumn(
             state = listState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(vertical = 12.dp)
+            modifier = Modifier.fillMaxSize().padding(padding),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(messages, key = { it.id }) { message ->
-                AnimatedVisibility(
-                    visible = true,
-                    enter = fadeIn() + slideInVertically()
-                ) {
-                    ChatMessageBubble(message = message)
-                }
+                ChatMessageBubble(message = message)
+            }
+            if (isLoading) {
+                item { TypingIndicator() }
             }
         }
     }
@@ -157,59 +150,48 @@ private fun ChatInputBar(
     onVoiceClick: () -> Unit
 ) {
     Surface(
-        shadowElevation = 8.dp,
-        color = MaterialTheme.colorScheme.surface
+        tonalElevation = 8.dp,
+        shadowElevation = 12.dp,
+        color = SurfaceContainerLowest,
+        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
                 value = inputText,
                 onValueChange = onInputChange,
                 modifier = Modifier.weight(1f),
-                placeholder = { Text("ಮಾತನಾಡಿ ಅಥವಾ ಟೈಪ್ ಮಾಡಿ... / Type or speak...") },
+                placeholder = { Text("Ask about health, vaccines...", fontSize = 14.sp) },
                 shape = RoundedCornerShape(24.dp),
-                maxLines = 3,
+                maxLines = 4,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = GreenMedium,
-                    unfocusedBorderColor = OutlineLight
+                    focusedBorderColor = Primary,
+                    unfocusedBorderColor = OutlineVariant
                 )
             )
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(12.dp))
 
-            // Voice button
             IconButton(
                 onClick = onVoiceClick,
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(
-                        if (isListening) ErrorColor else GreenSurface,
-                        CircleShape
-                    )
+                modifier = Modifier.size(48.dp).clip(CircleShape).background(if (isListening) Error.copy(0.1f) else PrimaryContainer.copy(0.1f))
             ) {
                 Icon(
                     if (isListening) Icons.Default.MicOff else Icons.Default.Mic,
-                    "Voice",
-                    tint = if (isListening) Color.White else GreenMedium
+                    null,
+                    tint = if (isListening) Error else Primary
                 )
             }
-            Spacer(Modifier.width(6.dp))
+            
+            Spacer(Modifier.width(8.dp))
 
-            // Send button
             IconButton(
                 onClick = onSend,
                 enabled = inputText.isNotBlank(),
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(
-                        if (inputText.isNotBlank()) GreenMedium else OutlineLight,
-                        CircleShape
-                    )
+                modifier = Modifier.size(48.dp).clip(CircleShape).background(if (inputText.isNotBlank()) Primary else OutlineVariant.copy(0.3f))
             ) {
-                Icon(Icons.Default.Send, "Send", tint = Color.White)
+                Icon(Icons.Default.Send, null, tint = Color.White)
             }
         }
     }
@@ -217,8 +199,8 @@ private fun ChatInputBar(
 
 @Composable
 private fun ChatMessageBubble(message: ChatMessage) {
-    val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
     val isUser = message.isFromUser
+    val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -226,52 +208,50 @@ private fun ChatMessageBubble(message: ChatMessage) {
     ) {
         if (!isUser) {
             Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .background(GreenMedium, CircleShape),
+                modifier = Modifier.size(32.dp).clip(CircleShape).background(Primary.copy(0.1f)),
                 contentAlignment = Alignment.Center
-            ) {
-                Text("🤖", fontSize = 16.sp)
-            }
+            ) { Text("🤖", fontSize = 16.sp) }
             Spacer(Modifier.width(8.dp))
         }
 
         Column(
-            modifier = Modifier.widthIn(max = 280.dp),
+            modifier = Modifier.widthIn(max = 290.dp),
             horizontalAlignment = if (isUser) Alignment.End else Alignment.Start
         ) {
             Surface(
                 shape = RoundedCornerShape(
-                    topStart = if (isUser) 18.dp else 4.dp,
-                    topEnd = if (isUser) 4.dp else 18.dp,
-                    bottomStart = 18.dp,
-                    bottomEnd = 18.dp
+                    topStart = if (isUser) 20.dp else 4.dp,
+                    topEnd = if (isUser) 4.dp else 20.dp,
+                    bottomStart = 20.dp,
+                    bottomEnd = 20.dp
                 ),
-                color = if (isUser) GreenMedium else MaterialTheme.colorScheme.surfaceVariant,
-                shadowElevation = 2.dp
+                color = if (isUser) Primary else SurfaceContainerLow,
+                border = if (isUser) null else BorderStroke(1.dp, OutlineVariant.copy(0.5f))
             ) {
-                if (message.isLoading) {
-                    Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                        CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp, color = GreenMedium)
-                        Spacer(Modifier.width(8.dp))
-                        Text("Thinking...", style = MaterialTheme.typography.bodySmall)
-                    }
-                } else {
-                    Text(
-                        text = message.content,
-                        modifier = Modifier.padding(12.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = if (isUser) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                Text(
+                    text = message.content,
+                    modifier = Modifier.padding(14.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (isUser) Color.White else OnSurface
+                )
             }
-            Spacer(Modifier.height(2.dp))
             Text(
                 timeFormat.format(Date(message.timestamp)),
+                modifier = Modifier.padding(top = 4.dp, start = 4.dp, end = 4.dp),
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.7f)
+                color = OnSurfaceVariant.copy(0.6f)
             )
         }
+    }
+}
+
+@Composable
+private fun TypingIndicator() {
+    Row(
+        modifier = Modifier.padding(start = 40.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text("Grama AI is thinking...", style = MaterialTheme.typography.labelSmall, color = OnSurfaceVariant)
     }
 }
 
@@ -282,58 +262,109 @@ private fun startVoiceRecognition(
 ) {
     val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
         putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-        putExtra(RecognizerIntent.EXTRA_LANGUAGE, "kn-IN") // Kannada
+        putExtra(RecognizerIntent.EXTRA_LANGUAGE, "kn-IN") // Preferred Kannada
     }
     speechRecognizer.setRecognitionListener(object : RecognitionListener {
         override fun onResults(results: Bundle) {
             val text = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull() ?: ""
-            if (text.isNotBlank()) onResult(text)
+            onResult(text)
         }
+        override fun onError(error: Int) { onResult("") }
         override fun onReadyForSpeech(p0: Bundle?) {}
         override fun onBeginningOfSpeech() {}
         override fun onRmsChanged(p0: Float) {}
         override fun onBufferReceived(p0: ByteArray?) {}
         override fun onEndOfSpeech() {}
-        override fun onError(error: Int) { onResult("") }
         override fun onPartialResults(p0: Bundle?) {}
         override fun onEvent(p0: Int, p1: Bundle?) {}
     })
     speechRecognizer.startListening(intent)
 }
 
-// Placeholder screens for routes
+// ─────────────────────────────────────────────────────────────────────────────
+// DISEASE DETECTION SCREEN
+// ─────────────────────────────────────────────────────────────────────────────
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiseaseDetectionScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
-            @OptIn(ExperimentalMaterial3Api::class)
             TopAppBar(
-                title = { Text("Disease Detection", color = Color.White) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Back", tint = Color.White) } },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = GreenMedium)
+                title = { Text("Disease Detection", fontWeight = FontWeight.Bold) },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, null) } },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = SurfaceContainerLowest),
+                modifier = Modifier.shadow(2.dp)
             )
-        }
+        },
+        containerColor = Background
     ) { padding ->
-        Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-            Text("📷 AI Image Disease Detection\nComing Soon", style = MaterialTheme.typography.headlineSmall)
+        Column(
+            modifier = Modifier.fillMaxSize().padding(padding).padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Box(
+                modifier = Modifier.size(140.dp).clip(CircleShape).background(Tertiary.copy(0.1f)),
+                contentAlignment = Alignment.Center
+            ) { Icon(Icons.Default.CameraAlt, null, modifier = Modifier.size(64.dp), tint = Tertiary) }
+            Spacer(Modifier.height(24.dp))
+            Text("Visual AI Diagnosis", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Primary)
+            Spacer(Modifier.height(12.dp))
+            Text(
+                "Capture or upload a photo of your animal's visible symptoms (skin, eyes, hooves) for instant AI analysis.",
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                color = OnSurfaceVariant
+            )
+            Spacer(Modifier.height(40.dp))
+            Button(
+                onClick = {},
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Primary)
+            ) {
+                Icon(Icons.Default.PhotoCamera, null)
+                Spacer(Modifier.width(12.dp))
+                Text("Open AI Camera", fontWeight = FontWeight.Bold)
+            }
         }
     }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// VOICE ASSISTANT SCREEN
+// ─────────────────────────────────────────────────────────────────────────────
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VoiceAssistantScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
-            @OptIn(ExperimentalMaterial3Api::class)
             TopAppBar(
-                title = { Text("Voice Assistant", color = Color.White) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Back", tint = Color.White) } },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = GreenMedium)
+                title = { Text("Voice Assistant", fontWeight = FontWeight.Bold) },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, null) } },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = SurfaceContainerLowest),
+                modifier = Modifier.shadow(2.dp)
             )
-        }
+        },
+        containerColor = Background
     ) { padding ->
-        Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-            Text("🎤 Voice Assistant\nComing Soon", style = MaterialTheme.typography.headlineSmall)
+        Box(
+            modifier = Modifier.fillMaxSize().padding(padding),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Box(
+                    modifier = Modifier.size(160.dp).clip(CircleShape).background(Primary.copy(0.05f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier.size(100.dp).clip(CircleShape).background(Primary),
+                        contentAlignment = Alignment.Center
+                    ) { Icon(Icons.Default.Mic, null, modifier = Modifier.size(48.dp), tint = Color.White) }
+                }
+                Spacer(Modifier.height(32.dp))
+                Text("Speak to Grama-Vaxi", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Primary)
+                Text("Hands-free assistance for busy farmers", color = OnSurfaceVariant)
+            }
         }
     }
 }

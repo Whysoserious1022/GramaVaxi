@@ -52,3 +52,13 @@ class GetAnimalByIdUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(animalId: String) = repository.getAnimalById(animalId)
 }
+
+class UpdateAnimalPhotoUseCase @Inject constructor(
+    private val repository: AnimalRepository
+) {
+    suspend operator fun invoke(animalId: String, photoUri: String): Result<Unit> {
+        val animal = repository.getAnimalById(animalId) ?: return Result.failure(Exception("Animal not found"))
+        val updatedAnimal = animal.copy(photoUri = photoUri)
+        return repository.registerAnimal(updatedAnimal).map {}
+    }
+}

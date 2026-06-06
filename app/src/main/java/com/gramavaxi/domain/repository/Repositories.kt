@@ -33,13 +33,6 @@ interface AlertRepository {
     suspend fun syncAlerts()
 }
 
-interface UserRepository {
-    suspend fun getCurrentUser(): User?
-    suspend fun saveUser(user: User): Result<Unit>
-    suspend fun updateUser(user: User): Result<Unit>
-    suspend fun logout()
-}
-
 interface AIRepository {
     suspend fun sendChatMessage(message: String): Result<String>
     suspend fun analyzeSymptoms(symptoms: String, species: String, ageMonths: Int): Result<DiseaseAnalysis>

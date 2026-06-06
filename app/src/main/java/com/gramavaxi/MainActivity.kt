@@ -3,22 +3,25 @@ package com.gramavaxi
 import android.Manifest
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.core.app.ActivityCompat
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.core.app.ActivityCompat
 import com.gramavaxi.presentation.navigation.GramaVaxiNavGraph
 import com.gramavaxi.presentation.theme.GramaVaxiTheme
+import com.gramavaxi.util.LanguageManager
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Apply saved locale before UI composition
+        LanguageManager.applySavedLocale(this)
         requestNotificationPermission()
         enableEdgeToEdge()
         setContent {
@@ -36,6 +39,7 @@ class MainActivity : ComponentActivity() {
     private fun requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ActivityCompat.requestPermissions(
+                
                 this,
                 arrayOf(Manifest.permission.POST_NOTIFICATIONS),
                 1001

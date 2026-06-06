@@ -22,9 +22,32 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun signInWithGoogle(idToken: String): Result<FirebaseUser> {
         return try {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
-            val result = firebaseAuth.signInWithCredential(credential).await()
-            result.user?.let { Result.success(it) }
-                ?: Result.failure(Exception("Google sign-in returned no user"))
+            val authResult = firebaseAuth.signInWithCredential(credential).await()
+            val user = authResult.user
+            if (user != null) Result.success(user)
+            else Result.failure(Exception("Google sign-in returned null user"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun signInWithEmail(email: String, password: String): Result<FirebaseUser> {
+        return try {
+            val authResult = firebaseAuth.signInWithEmailAndPassword(email, password).await()
+            val user = authResult.user
+            if (user != null) Result.success(user)
+            else Result.failure(Exception("Email sign-in returned null user"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun signUpWithEmail(email: String, password: String): Result<FirebaseUser> {
+        return try {
+            val authResult = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+            val user = authResult.user
+            if (user != null) Result.success(user)
+            else Result.failure(Exception("Email sign-up returned null user"))
         } catch (e: Exception) {
             Result.failure(e)
         }
