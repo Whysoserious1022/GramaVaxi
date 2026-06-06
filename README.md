@@ -144,7 +144,6 @@ To ensure rural applicability and high performance, the following testing and op
 ---
 
 ## 🔮 Future Enhancements
-- [ ] Direct Firebase Phone OTP Verification.
 - [ ] Local Offline PDF generation for QR Health Cards.
 - [ ] Integration of custom TensorFlow Lite models for local offline disease classification.
 - [ ] Real-time GPS distance calculation to the nearest vet clinic.
